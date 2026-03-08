@@ -91,8 +91,14 @@
         }
 
         :root.theme-light .search-box {
-            background: rgba(0, 0, 0, 0.05) !important;
-            border-color: rgba(0, 0, 0, 0.15) !important;
+            background: rgba(0, 0, 0, 0.04) !important;
+            border: 1px solid rgba(0, 0, 0, 0.15) !important;
+        }
+
+        :root.theme-light .search-box:focus-within {
+            background: rgba(2, 132, 199, 0.06) !important;
+            border-color: var(--cyan) !important;
+            box-shadow: 0 0 12px rgba(2, 132, 199, 0.15) !important;
         }
 
         :root.theme-light .search-input {
@@ -100,12 +106,19 @@
         }
 
         :root.theme-light .search-input::placeholder {
-            color: #888 !important;
+            color: #999 !important;
         }
 
-        :root.theme-light .tools button,
-        :root.theme-light .tools span {
-            color: #333 !important;
+        :root.theme-light .btn {
+            background: rgba(0, 0, 0, 0.04) !important;
+            border: 1px solid rgba(0, 0, 0, 0.10) !important;
+            color: #444 !important;
+        }
+
+        :root.theme-light .btn:hover {
+            background: rgba(0, 0, 0, 0.08) !important;
+            border-color: rgba(0, 0, 0, 0.18) !important;
+            color: #111 !important;
         }
 
         /* Light theme: Status bar */
@@ -418,14 +431,15 @@
         .search-box {
             display: flex;
             align-items: center;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.35);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: var(--radius-full);
-            padding: 6px 16px;
+            padding: 4px 14px;
             flex-shrink: 0;
             position: relative;
             transition: all 0.3s var(--easing);
-            gap: 8px;
+            gap: 6px;
+            height: 32px;
         }
 
         .search-box:focus-within {
@@ -440,7 +454,7 @@
             color: var(--text-luma);
             font-family: 'Inter';
             font-weight: 500;
-            font-size: 11px;
+            font-size: 12px;
             outline: none;
             width: 140px;
             transition: width 0.3s var(--easing);
@@ -456,22 +470,33 @@
 
         .tools {
             display: flex;
-            gap: 8px;
+            align-items: center;
+            gap: 4px;
             flex-shrink: 0;
-            color: var(--text-muted);
         }
 
         .btn {
-            background: none;
-            border: none;
-            color: inherit;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            color: var(--text-muted);
             cursor: pointer;
-            font-size: 16px;
-            transition: color 0.2s;
+            font-size: 18px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s var(--easing);
+            padding: 0;
+            line-height: 1;
         }
 
         .btn:hover {
             color: var(--text-luma);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
         }
 
         /* --- MAIN GRID --- */
