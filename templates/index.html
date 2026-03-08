@@ -145,14 +145,91 @@
 
         .tickers {
             display: flex;
-            gap: 10px;
             overflow: hidden;
             flex: 1;
+            position: relative;
             white-space: nowrap;
             font-family: 'JetBrains Mono';
             font-size: 10px;
             font-weight: 500;
             min-width: 0;
+            mask-image: linear-gradient(to right, transparent, black 2%, black 98%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 2%, black 98%, transparent);
+        }
+
+        .ticker-track {
+            display: flex;
+            width: max-content;
+            animation: marquee-scroll 40s linear infinite;
+        }
+
+        .ticker-content {
+            display: flex;
+            gap: 16px;
+            padding-right: 16px;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .ticker-track:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes marquee-scroll {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* --- TRACKED STOCKS PILLS --- */
+        .tracked-stock-pill {
+            position: relative;
+            font-family: 'JetBrains Mono';
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--cyan);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tracked-stock-pill:hover {
+            background: rgba(6, 182, 212, 0.2);
+            border-color: var(--cyan);
+        }
+
+        .delete-stock-btn {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 14px;
+            height: 14px;
+            background: var(--bear);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            box-shadow: 0 0 5px rgba(255, 30, 86, 0.4);
+        }
+
+        .tracked-stock-pill:hover .delete-stock-btn {
+            opacity: 1;
+        }
+
+        .delete-stock-btn:hover {
+            transform: scale(1.15);
         }
 
         .tk {
@@ -198,22 +275,36 @@
         .search-box {
             display: flex;
             align-items: center;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: var(--radius-full);
-            padding: 3px 10px;
+            padding: 6px 16px;
             flex-shrink: 0;
             position: relative;
+            transition: all 0.3s var(--easing);
+            gap: 8px;
+        }
+
+        .search-box:focus-within {
+            border-color: var(--cyan);
+            background: rgba(6, 182, 212, 0.1);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
         }
 
         .search-input {
             background: transparent;
             border: none;
             color: var(--text-luma);
-            font-family: 'JetBrains Mono';
-            font-size: 10px;
+            font-family: 'Inter';
+            font-weight: 500;
+            font-size: 11px;
             outline: none;
-            width: 90px;
+            width: 140px;
+            transition: width 0.3s var(--easing);
+        }
+
+        .search-input:focus {
+            width: 180px;
         }
 
         .search-input::placeholder {
@@ -1055,6 +1146,73 @@
         .ai-stream-box li {
             margin-bottom: 8px;
         }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 1024px) {
+            .workspace {
+                display: flex !important;
+                flex-direction: column;
+                gap: 24px;
+                height: auto;
+                overflow-y: auto;
+            }
+
+            body {
+                overflow-y: auto;
+            }
+
+            .col {
+                height: auto;
+                padding-bottom: 20px;
+            }
+
+            div[style*="flex: 1 1 auto; display: flex; gap: 10px; min-height: 280px;"] {
+                flex-direction: column !important;
+            }
+
+            .panel {
+                min-height: 300px;
+            }
+
+            #second-page {
+                overflow-y: auto;
+            }
+
+            #sp-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 12px;
+            }
+
+            .clock {
+                display: none;
+            }
+
+            .tickers {
+                order: 3;
+                width: 100%;
+                margin-top: 12px;
+                flex: 0 0 100%;
+            }
+
+            .tools {
+                margin-left: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-input {
+                width: 100px;
+            }
+
+            .search-input:focus {
+                width: 140px;
+            }
+        }
     </style>
 </head>
 
@@ -1126,9 +1284,36 @@
                     </div>
                 </div>
             </div>
-            <div class="panel" style="flex: 1 1 auto; min-height: 280px;">
-                <div class="p-head">Sector Performance Matrix</div>
-                <div class="p-body" id="sectors-pane" style="padding-top:8px; overflow-y:auto;"></div>
+            <div style="flex: 1 1 auto; display: flex; gap: 10px; min-height: 280px;">
+                <!-- Left: Sector Matrix (Width 50%) -->
+                <div class="panel" style="flex: 1; min-width: 0;">
+                    <div class="p-head">Sector Performance Matrix</div>
+                    <div class="p-body" id="sectors-pane" style="padding-top:8px; overflow-y:auto;"></div>
+                </div>
+                <!-- Right: Stock Specific AI Report & News -->
+                <div class="panel" style="flex: 1; min-width: 0;">
+                    <div class="p-head" style="justify-content: space-between;">
+                        <span>Stock Specific AI Report & News</span>
+                        <div style="display:flex; gap:16px;">
+                            <span style="font-size:16px; cursor:pointer;" title="Refresh Specific News"
+                                onclick="apiRefresh()">⟳</span>
+                            <span style="font-size:18px; cursor:pointer; font-weight:bold; line-height: 1;"
+                                title="Add/Remove Tracked Stocks" onclick="openAddStockModal()">+</span>
+                        </div>
+                    </div>
+                    <div class="p-body"
+                        style="padding: 12px; display: flex; flex-direction: column; gap: 12px; overflow: hidden;">
+                        <div id="tracked-stocks-pills"
+                            style="display: flex; flex-wrap: wrap; gap: 6px; flex-shrink: 0;"></div>
+                        <div id="tracked-news-pane" class="news-list" style="flex: 1; overflow-y: auto;">
+                            <!-- Specific news populates here -->
+                            <div
+                                style="font-family:'JetBrains Mono'; font-size:10px; color:var(--text-muted); padding:10px; text-align:center;">
+                                Please add stocks to track specific intelligence.
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1178,6 +1363,32 @@
         </div>
     </div>
 
+    <!-- ADD STOCK MODAL -->
+    <div id="add-stock-overlay"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); z-index: 10000; display: none; align-items: center; justify-content: center;">
+        <div class="settings-modal">
+            <h2 style="font-family:'Outfit'; font-size:24px; color:var(--text-luma); margin-bottom:8px;">Track Specific
+                Stocks
+            </h2>
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:24px;">Enter ticker symbols or names to
+                track dedicated news and intelligence sweeps. (Comma separated)</p>
+
+            <label style="font-family:'JetBrains Mono'; color:var(--cyan); font-size:11px; font-weight:700;">STOCKS
+                UNDER TRACKING</label>
+            <div style="position: relative;">
+                <input type="text" id="add-stock-input" class="s-input" placeholder="e.g. HDFC BANK, RELIANCE, TCS"
+                    onkeyup="handleAddStockSearch(event)" onfocus="handleAddStockSearch(event)">
+                <div class="search-dropdown" id="add-stock-dropdown" style="width: 100%;"></div>
+            </div>
+
+            <div style="display:flex; gap:12px; margin-top:24px;">
+                <button class="btn-glow" style="flex:1; text-align:center" onclick="saveTrackedStocks()">Update Tracking
+                    Vector</button>
+                <button class="btn" style="padding:12px 24px;" onclick="closeAddStockModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- SETTINGS MODAL -->
     <div id="settings-overlay">
         <div class="settings-modal">
@@ -1193,6 +1404,8 @@
             <div style="display:flex; gap:12px; margin-top:24px;">
                 <button class="btn-glow" style="flex:1; text-align:center" onclick="saveSettings()">Save
                     Configuration</button>
+                <button class="btn" style="padding:12px 24px; color:var(--bear); border: 1px solid rgba(244,63,94,0.3);"
+                    onclick="clearApiKey()">Delete Key</button>
                 <button class="btn" style="padding:12px 24px;" onclick="closeSettings()">Cancel</button>
             </div>
         </div>
@@ -1348,15 +1561,19 @@
         // --- RENDERERS ---
         function renderTickerStrip() {
             const keys = ['NIFTY', 'SENSEX', 'BANKNIFTY', 'INRUSD', 'BRENT', 'GOLD', 'VIX_US', 'DXY', 'US10Y', 'NASDAQ', 'BTC'];
-            let html = '';
+            let html = '<div class="ticker-track">';
+            let itemsHtml = '<div class="ticker-content">';
             keys.forEach(k => {
                 const it = simPrices[k]; if (!it) return;
-                html += `<div class="tk ${it.open ? 'is-open' : ''}" onclick="loadChartForTicker('${k}')">
+                itemsHtml += `<div class="tk ${it.open ? 'is-open' : ''}" onclick="loadChartForTicker('${k}')">
                     <span class="tk-l">${k}</span>
                     <span class="tk-v" style="color: ${it.chg_pct >= 0 ? 'var(--bull)' : 'var(--bear)'}">${formatVal(it.display)}</span>
                     <span class="tk-badge">${it.open ? 'LIVE' : 'CLOSED'}</span>
                 </div>`;
             });
+            itemsHtml += '</div>';
+            // Duplicate the entire content block exactly to create a 50% translation loop
+            html += itemsHtml + itemsHtml + '</div>';
             document.getElementById('ticker-strip').innerHTML = html;
         }
 
@@ -1364,11 +1581,202 @@
             // dataStateClass: 'c-bull', 'c-bear', 'c-accent', 'c-cyan'
             const isLive = (isLiveObjKey && simPrices[isLiveObjKey] && simPrices[isLiveObjKey].open);
             const liveCls = isLive ? 'is-live' : '';
-            const action = isLiveObjKey ? `onclick="loadChartForTicker('${isLiveObjKey}')"` : '';
+            const action = isLiveObjKey ? `onclick="loadChartForTicker('${isLiveObjKey}')"` : `onclick="openRadarIntel('${label}', '${valStr}')" style="cursor:pointer;" title="View Macro Intel"`;
             return `<div class="rt ${dataStateClass} ${liveCls}" ${action}>
                 <div class="rt-l">${label}</div>
                 <div class="rt-v">${valStr}</div>
             </div>`;
+        }
+
+        window.openRadarIntel = function (label, value) {
+            document.getElementById('sp-title').textContent = `${label} MACRO INTELLIGENCE REPORT`;
+
+            // Filter news based on label tokens
+            const tokens = label.toLowerCase().split(' ').filter(x => x.length > 2);
+            let relNews = newsDataCache.filter(n => {
+                const text = (n.title + ' ' + n.desc).toLowerCase();
+                if (tokens.some(t => text.includes(t))) return true;
+                return false;
+            });
+
+            // Fallback to latest global macro news if none specifically match
+            if (relNews.length === 0) {
+                relNews = newsDataCache.slice(0, 5);
+            } else {
+                relNews = relNews.slice(0, 5);
+            }
+
+            const formatExactDate = (dStr) => {
+                try {
+                    const d = new Date(dStr);
+                    if (isNaN(d)) return dStr;
+                    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ', ' +
+                        d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) + ' IST';
+                } catch (e) { return dStr; }
+            };
+
+            const rsHtml = relNews.map(n => `
+                <div class="news-card" onclick="openNewsPage(${newsDataCache.indexOf(n)})">
+                    <div style="font-size: 13px; margin-bottom: 6px; color: var(--text-luma); line-height: 1.5;">${n.title}</div>
+                    <div class="n-meta">
+                        <span class="n-src">${n.source}</span>
+                        <span class="n-time">${formatExactDate(n.time)}</span>
+                        <span class="n-badge b-${n.sentiment.toLowerCase() === 'bullish' ? 'bull' : (n.sentiment.toLowerCase() === 'bearish' ? 'bear' : 'neut')}">${n.sentiment}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('sp-left').innerHTML = `
+                <div style="padding: 24px; color: var(--text-luma); font-family: 'Inter', sans-serif;">
+                    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 48px; font-weight: 700; color: var(--text-base); line-height: 1.1; margin-bottom: 8px;">
+                        ${label}
+                    </div>
+                    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 28px; color: var(--cyan); margin-bottom: 24px;">
+                        ${value.replace(/<[^>]*>?/gm, '')}
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 32px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+                        Macro-economic factor analysis and related global news telemetry.
+                    </p>
+                    <h3 style="font-family: 'Space Grotesk'; font-size: 18px; color: var(--text-base); margin-bottom: 16px;">Related Macro Telemetry</h3>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        ${rsHtml}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('tv-container').innerHTML = `
+                <div id="ai-content" style="padding: 24px; color: var(--text-luma); font-family: 'Inter', sans-serif; height: 100%; overflow-y: auto;">
+                </div>
+            `;
+
+            document.getElementById('second-page').classList.add('active');
+
+            // Trigger AI Stream for Macro
+            streamAIMacroIntel(label, value, relNews);
+        }
+
+        async function streamAIMacroIntel(label, value, relNews) {
+            if (_aiAbortController) {
+                _aiAbortController.abort();
+                _aiAbortController = null;
+            }
+            _aiAbortController = new AbortController();
+            const signal = _aiAbortController.signal;
+
+            const key = localStorage.getItem('aurion_llm_key');
+            const aic = document.getElementById('ai-content');
+
+            if (!key) {
+                aic.innerHTML = `<div style="text-align:center; padding: 40px; color:var(--bear);"><h2>⚠️ AUTHENTICATION REQUIRED</h2><p>No valid LLM API key detected in Local Storage.</p><button class="btn-glow" style="margin-top:20px;" onclick="openSettings()">Configure Settings Now</button></div>`;
+                return;
+            }
+
+            aic.innerHTML = `
+                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px; gap:16px;">
+                    <div style="width:32px; height:32px; border:3px solid var(--border); border-top:3px solid var(--cyan); border-radius:50%; animation: spin 1s linear infinite;"></div>
+                    <div style="font-family:'JetBrains Mono'; font-size:13px; color:var(--cyan); letter-spacing:1px;">GENERATING MACRO INTELLIGENCE REPORT</div>
+                    <div style="font-family:'JetBrains Mono'; font-size:11px; color:var(--text-muted);">Analyzing ${label} • Please wait...</div>
+                </div>
+                <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+            `;
+
+            const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+            const newsContext = relNews.map(n => `- ${n.title}`).join('\n');
+            const cleanVal = typeof value === 'string' ? value.replace(/<[^>]*>?/gm, '') : value;
+
+            const prompt = `You are an elite global macro analyst for Aurion Terminal.
+Provide a structured, high-level analysis of the macroeconomic factor: ${label} (Current Value: ${cleanVal}).
+
+CONTEXT:
+- Today's Date: ${today}
+- Latest relevant global news headlines:
+${newsContext}
+
+CRITICAL RULES:
+Format your response EXACTLY as the sections below with bullet points.
+
+**Current State & Trajectory:**
+• [3-4 bullet points analyzing the current value (${cleanVal}), historical context, and immediate trajectory]
+
+**Global Market Impact:**
+• [3-4 bullet points analyzing how this factor is currently impacting equity markets, bond yields, and currency pairs]
+
+**Forward Outlook & Risks:**
+• [3-4 bullet points detailing future forecasts, central bank policy implications, and potential black swan risks]
+
+Keep each bullet point concise (1-2 lines max). Provide actionable intelligence.`;
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: signal,
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { temperature: 0.3 }
+                    })
+                });
+
+                if (!response.ok) throw new Error('API Request Failed');
+
+                const data = await response.json();
+                let fullText = "";
+                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    fullText = data.candidates[0].content.parts[0].text;
+                } else {
+                    throw new Error('Invalid format returned from Gemini');
+                }
+
+                let htmlText = fullText
+                    .replace(/\*\*(.*?)\*\*/g, '<h3 style="color:var(--cyan); font-family:JetBrains Mono; font-size:13px; margin-top:20px; margin-bottom:8px; letter-spacing:1px; text-transform:uppercase;">$1</h3>')
+                    .replace(/^[•\*]\s+(.*?)$/gm, '<li style="margin-bottom:6px; line-height:1.5; color:var(--text-luma); font-size:12px;">$1</li>')
+                    .replace(/^- \s*(.*?)$/gm, '<li style="margin-bottom:6px; line-height:1.5; color:var(--text-luma); font-size:12px;">$1</li>')
+                    .replace(/\n/g, '<br/>');
+
+                const tokens = htmlText.split(/(<[^>]+>)/g);
+                let outputHTML = "";
+                let currentTokenIdx = 0;
+                let currentCharIdx = 0;
+
+                const headerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+                        <h2 style="margin:0;">${label} Macro Intel</h2>
+                        <button class="btn-glow" style="padding:6px 14px; font-size:11px; display:flex; align-items:center; gap:6px;" onclick="streamAIMacroIntel('${label}', '${value}', [])" title="Regenerate AI Report">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 1 0 2.1-5.7L2 9"></path></svg> Refresh
+                        </button>
+                    </div>
+                `;
+
+                function typeNext() {
+                    if (signal.aborted) return;
+                    if (currentTokenIdx >= tokens.length) {
+                        aic.innerHTML = headerHTML + outputHTML;
+                        return;
+                    }
+                    const token = tokens[currentTokenIdx];
+                    if (token.startsWith('<')) {
+                        outputHTML += token;
+                        currentTokenIdx++;
+                        typeNext();
+                    } else {
+                        if (currentCharIdx < token.length) {
+                            outputHTML += token[currentCharIdx];
+                            currentCharIdx++;
+                            aic.innerHTML = headerHTML + outputHTML + '<span class="ai-cursor"></span>';
+                            setTimeout(typeNext, 3);
+                        } else {
+                            currentCharIdx = 0;
+                            currentTokenIdx++;
+                            typeNext();
+                        }
+                    }
+                }
+                typeNext();
+
+            } catch (error) {
+                if (error.name === 'AbortError') return;
+                aic.innerHTML = `<div style="padding: 20px; color:var(--bear);"><h3>Analysis Interrupted</h3><p>Matrix failure attempting to reach Google Generative Language API.</p></div>`;
+            }
         }
 
         function renderRadar() {
@@ -1404,21 +1812,97 @@
             rg.innerHTML = t.join('');
         }
 
+        let trackedStocks = [];
+        try {
+            const saved = localStorage.getItem('aurion_tracked_stocks');
+            if (saved) trackedStocks = JSON.parse(saved);
+        } catch (e) { }
+
+        function renderTrackedStocks() {
+            const container = document.getElementById('tracked-stocks-pills');
+            const newsContainer = document.getElementById('tracked-news-pane');
+            if (!container || !newsContainer) return;
+
+            if (trackedStocks.length === 0) {
+                container.innerHTML = '';
+                newsContainer.innerHTML = `<div style="font-family:'JetBrains Mono'; font-size:10px; color:var(--text-muted); padding:10px; text-align:center;"> Please use the plus icon to add stocks. </div>`;
+                return;
+            }
+
+            container.innerHTML = trackedStocks.map((stock, idx) => `
+                <div class="tracked-stock-pill" onclick="searchAndOpenTicker('${stock}')" title="Analyze ${stock}">
+                    ${stock}
+                    <div class="delete-stock-btn" onclick="event.stopPropagation(); removeTrackedStock(${idx})" title="Remove ${stock}">✕</div>
+                </div>
+            `).join('');
+
+            let stockNews = newsDataCache.filter(n => {
+                const text = (n.title + ' ' + n.desc).toUpperCase();
+                return trackedStocks.some(t => {
+                    const s = t.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                    return text.includes(s) || text.includes(t.toUpperCase());
+                });
+            });
+
+            if (stockNews.length === 0) {
+                newsContainer.innerHTML = `<div style="font-family:'JetBrains Mono'; font-size:10px; color:var(--text-muted); padding:10px; text-align:center;"> No recent intel found for tracked stocks in current cycle. </div>`;
+            } else {
+                newsContainer.innerHTML = stockNews.map(n => {
+                    const i = newsDataCache.indexOf(n);
+                    let badgeClass = n.sentiment.toLowerCase() === 'bullish' ? 'bull' : (n.sentiment.toLowerCase() === 'bearish' ? 'bear' : 'neutral');
+                    return `
+                        <div class="n-item" onclick="openNewsPage(${i})" style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.03);">
+                            <div class="n-meta" style="margin-bottom:6px;">
+                                <span class="n-src">${n.source}</span>
+                                <span class="badge b-${badgeClass}" style="scale:0.8; transform-origin:right;">${n.sentiment.toUpperCase()}</span>
+                            </div>
+                            <div class="n-title" style="font-size:12px; margin-bottom:4px; line-height:1.4;">${n.title}</div>
+                            <div class="n-time" style="font-family:'JetBrains Mono'; font-size:9px;">${formatExactTime(n.ts)}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        window.removeTrackedStock = function (index) {
+            trackedStocks.splice(index, 1);
+            localStorage.setItem('aurion_tracked_stocks', JSON.stringify(trackedStocks));
+            renderTrackedStocks();
+        }
+
+        window.openAddStockModal = function () {
+            document.getElementById('add-stock-input').value = trackedStocks.join(', ');
+            document.getElementById('add-stock-overlay').style.display = 'flex';
+        }
+
+        window.closeAddStockModal = function () {
+            document.getElementById('add-stock-overlay').style.display = 'none';
+        }
+
+        window.saveTrackedStocks = function () {
+            const raw = document.getElementById('add-stock-input').value;
+            trackedStocks = raw.split(',').map(s => s.trim().toUpperCase()).filter(s => s.length > 0);
+            localStorage.setItem('aurion_tracked_stocks', JSON.stringify(trackedStocks));
+            closeAddStockModal();
+            renderTrackedStocks();
+        }
+
         function renderNews() {
+            renderTrackedStocks();
             document.getElementById('news-pane').innerHTML = newsDataCache.map((n, i) => {
                 let badgeClass = n.sentiment.toLowerCase();
                 if (badgeClass === 'bullish') badgeClass = 'bull';
                 if (badgeClass === 'bearish') badgeClass = 'bear';
 
                 return `
-                <div class="n-item" onclick="openNewsPage(${i})">
-                    <div class="n-meta">
-                        <span class="n-src">${n.source}</span>
-                        <span class="badge b-${badgeClass}">${n.sentiment}</span>
+                    <div class="n-item" onclick="openNewsPage(${i})">
+                        <div class="n-meta">
+                            <span class="n-src">${n.source}</span>
+                            <span class="badge b-${badgeClass}">${n.sentiment}</span>
+                        </div>
+                        <div class="n-title">${n.title}</div>
+                        <div class="n-time">${formatExactTime(n.ts)}</div>
                     </div>
-                    <div class="n-title">${n.title}</div>
-                    <div class="n-time">${formatExactTime(n.ts)}</div>
-                </div>
                 `;
             }).join('');
         }
@@ -1461,8 +1945,8 @@
                 let spk = '';
                 if (r.sparkline && r.sparkline.length) {
                     const min = Math.min(...r.sparkline), max = Math.max(...r.sparkline), range = max - min || 1;
-                    const map = r.sparkline.map((v, i) => `${(i / (r.sparkline.length - 1)) * 100},${24 - ((v - min) / range) * 24}`);
-                    spk = `<svg class="s-spark ${isUp ? 'up' : 'dn'}" viewBox="0 0 100 24" preserveAspectRatio="none"><path d="M${map.join(' L')}"/></svg>`;
+                    const map = r.sparkline.map((v, i) => `${(i / (r.sparkline.length - 1)) * 100},${24 - ((v - min) / range) * 24} `);
+                    spk = `<svg class="s-spark ${isUp ? 'up' : 'dn'}" viewBox="0 0 100 24" preserveAspectRatio="none"><path d="M${map.join(' L')}" /></svg>`;
                 }
                 ht += `<div class="sec-row" onclick="openSectorPage('${k}')">
                     <div class="s-name">${k}</div>
@@ -1486,10 +1970,11 @@
             if (a.length === 0) a.push({ l: 'INFO', t: 'SYSTEM NOMINAL — All metrics aligned correctly.' });
 
             document.getElementById('alerts-pane').innerHTML = a.map(x => `
-                <div class="alert-card a-${x.l}">
+                <div class="alert-card a-${x.l}" style="border-left: 3px solid var(--${x.l === 'CRITICAL' ? 'bear' : (x.l === 'WARNING' ? 'accent' : 'cyan')}); position: relative;">
+                    ${x.l !== 'INFO' ? '<div style="position:absolute; top:12px; right:12px; width:6px; height:6px; background:var(--bear); border-radius:50%; animation:pulse 1s infinite alternate; box-shadow:0 0 8px var(--bear);"></div>' : ''}
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span class="badge b-${x.l === 'CRITICAL' ? 'bear' : (x.l === 'WARNING' ? 'accent' : 'cyan')}">${x.l}</span>
-                        <span style="font-family:'JetBrains Mono'; font-size:10px; color:var(--text-muted)">${formatExactTime(Date.now() / 1000)}</span>
+                        <span style="font-family:'JetBrains Mono'; font-size:10px; color:var(--text-muted); padding-right: 12px;">${formatExactTime(Date.now() / 1000)}</span>
                     </div>
                     <div class="alert-txt">${x.t}</div>
                 </div>
@@ -1508,7 +1993,7 @@
                     <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center;">
                         <div style="background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.3); padding: 40px; border-radius: 12px; max-width: 500px;">
                             <h3 style="color:var(--cyan); margin-bottom: 12px; font-family:'JetBrains Mono'; font-size:16px;">EXCHANGE DATA RESTRICTED</h3>
-                            <p style="color:var(--text-muted); margin-bottom: 24px; font-size:13px; line-height:1.6;">Live charting for <b>${symbol}</b> is restricted by the exchange on 3rd-party terminals.<br/>View the full interactive chart directly on TradingView.</p>
+                            <p style="color:var(--text-muted); margin-bottom: 24px; font-size:13px; line-height:1.6;">Live charting for <b>${symbol}</b> is restricted by the exchange on 3rd-party terminals.<br />View the full interactive chart directly on TradingView.</p>
                             <a href="https://in.tradingview.com/chart/?symbol=${symbol}" target="_blank" style="background: var(--cyan); color: #000; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-family:'JetBrains Mono'; font-size:13px; display:inline-block; transition:all 0.2s ease; cursor:pointer;" onmouseover="this.style.boxShadow='0 0 15px rgba(0,240,255,0.4)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='none'; this.style.transform='translateY(0)'">
                                 OPEN ON TRADINGVIEW ↗
                             </a>
@@ -1584,7 +2069,7 @@
                             <span class="badge b-${bClass}">${n.sentiment.toUpperCase()}</span>
                         </div>
                     </div>
-                `;
+                    `;
             }).join('') + `</div>`;
 
             document.getElementById('sp-left').innerHTML = `
@@ -1593,7 +2078,7 @@
                 <h1 style="font-family: 'Outfit', sans-serif; font-size: 22px; margin-bottom: 12px; color: var(--text-luma); font-weight: 800; text-transform: uppercase;">Analytics: ${k}</h1>
                 <a href="https://www.tradingview.com/chart/?symbol=${symbol}" target="_blank" class="btn-glow" style="margin-bottom:16px;">Open on TradingView ↗</a>
                 ${newsHtml}
-            `;
+                `;
 
             // Also populate the right side with the TradingView chart
             loadTradingViewWidget(symbol);
@@ -1656,7 +2141,7 @@
             // Look up CSV data for this stock
             const cleanT = k.replace(/[^A-Z0-9]/g, '');
             const csvStock = ALL_STOCKS.find(s => s.t === k || s.n.toUpperCase().includes(k) || s.n.toUpperCase().replace(/[^A-Z0-9]/g, '').includes(cleanT));
-            window.loadStockReport(k, `NSE:${k}`, csvStock);
+            window.loadStockReport(k, `NSE:${k} `, csvStock);
         }
 
         window.searchAndOpenTicker = function (val) {
@@ -1701,7 +2186,7 @@
             }
             const revNum = parseFloat(rev);
             const isRec = revNum > 0 ? 'var(--bull)' : 'var(--bear)';
-            const rTxt = revNum > 0 ? `+${rev}%` : `${rev}%`;
+            const rTxt = revNum > 0 ? `+ ${rev}% ` : `${rev}% `;
             const rsiNum = parseFloat(rsi_val);
             const rsiColor = rsiNum > 70 ? 'var(--bear)' : (rsiNum < 30 ? 'var(--bull)' : 'var(--accent)');
             const rsiLabel = rsiNum > 70 ? 'OVERBOUGHT' : (rsiNum < 30 ? 'OVERSOLD' : 'NEUTRAL');
@@ -1712,7 +2197,7 @@
             const sma200Status = priceNum > sma200Num ? 'ABOVE' : 'BELOW';
 
             document.getElementById('tv-container').innerHTML = `
-                <div style="padding: 40px; color: var(--text-luma); font-family: 'Inter', sans-serif; height: 100%; overflow-y: auto;">
+                    <div style="padding: 40px; color: var(--text-luma); font-family: 'Inter', sans-serif; height: 100%; overflow-y: auto;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px;">
                         <div>
                             <h2 style="font-family: 'Space Grotesk'; font-size: 48px; margin-bottom: 8px;">${k} Technicals & Fundamentals</h2>
@@ -1782,8 +2267,8 @@
                             <li><strong>Board Member Exit:</strong> Independent Director resigned citing personal reasons. Replacement search ongoing.</li>
                         </ul>
                     </div>
-                </div>
-            `;
+                </div >
+                    `;
 
             const keywordMap = { 'NIFTY': 'nifty', 'SENSEX': 'sensex', 'BANKNIFTY': 'bank', 'BRENT': 'crude', 'GOLD': 'gold', 'BTC': 'crypto' };
             const targetKeyword = keywordMap[k] || k.toLowerCase();
@@ -1806,16 +2291,16 @@
                             <span class="badge b-${badgeClass}">${n.sentiment.toUpperCase()}</span>
                         </div>
                     </div>
-                `;
+                    `;
             }).join('') + `</div>`;
 
             document.getElementById('sp-left').innerHTML = `
-                <div style="font-family: 'JetBrains Mono'; font-size: 48px; font-weight: 800; color: var(--text-luma); margin-bottom: 0px; letter-spacing:-1.5px;">${k}</div>
+                    <div style="font-family: 'JetBrains Mono'; font-size: 48px; font-weight: 800; color: var(--text-luma); margin-bottom: 0px; letter-spacing:-1.5px;">${k}</div>
                 <div style="font-family: 'JetBrains Mono'; font-size: 32px; font-weight: 600; color: var(--cyan); margin-bottom: 8px;">₹${lastPriceVal}</div>
                 <div style="font-family: 'JetBrains Mono'; font-size: 18px; color: var(--text-muted); margin-bottom: 24px; font-weight:700;">EQUITY ANALYSIS</div>
                 <p style="color: var(--text-muted); line-height:1.6; margin-bottom: 32px;">Real-time quantitative sweep completed. AI summary generated based on recent filings, market sentiment, and internal telemetry.</p>
                 ${newsHtml}
-            `;
+                `;
             document.getElementById('second-page').classList.add('active');
 
             // Trigger AI Stream
@@ -1824,29 +2309,29 @@
 
         window.openNewsPage = function (idx) {
             const item = newsDataCache[idx];
-            document.getElementById('sp-title').textContent = `INTEL REPORT: ${item.source}`;
+            document.getElementById('sp-title').textContent = `INTEL REPORT: ${item.source} `;
 
             document.getElementById('second-page').classList.add('active');
 
             document.getElementById('sp-left').innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
                     <span class="badge b-${item.sentiment}">${item.sentiment.toUpperCase()}</span>
                     <span style="font-family: 'JetBrains Mono'; font-size: 12px; color: var(--text-muted);">${formatExactDate(item.ts)}</span>
                 </div>
                 <h1 style="font-family:'Outfit'; font-size:32px; color:var(--text-luma); margin-bottom:24px; line-height:1.2;">${item.title}</h1>
                 <p style="font-family:'Inter'; font-size:15px; color:var(--text-muted); line-height:1.6; margin-bottom:32px;">${item.desc.replace(/<[^>]*>?/gm, '')}</p>
                 <a href="${item.link}" target="_blank" class="btn-glow" style="display:inline-block; font-family:'JetBrains Mono'; font-size:12px;">Access Original Source ↗</a>
-            `;
+                `;
 
             // Setup right side for AI summary
             document.getElementById('tv-container').innerHTML = `
-                <div id="news-ai-content" style="padding: 40px; color: var(--text-luma); font-family: 'Inter', sans-serif; height: 100%; overflow-y: auto;">
-                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px; gap:16px;">
-                        <div style="width:32px; height:32px; border:3px solid var(--border); border-top:3px solid var(--cyan); border-radius:50%; animation: spin 1s linear infinite;"></div>
-                        <div style="font-family:'JetBrains Mono'; font-size:13px; color:var(--cyan); letter-spacing:1px;">GENERATING AI NEWS SUMMARY</div>
-                    </div>
+                    <div id="news-ai-content" style="padding: 40px; color: var(--text-luma); font-family: 'Inter', sans-serif; height: 100%; overflow-y: auto;">
+                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px; gap:16px;">
+                            <div style="width:32px; height:32px; border:3px solid var(--border); border-top:3px solid var(--cyan); border-radius:50%; animation: spin 1s linear infinite;"></div>
+                            <div style="font-family:'JetBrains Mono'; font-size:13px; color:var(--cyan); letter-spacing:1px;">GENERATING AI NEWS SUMMARY</div>
+                        </div>
                 </div>
-            `;
+                    `;
 
             // Trigger AI Stream for News
             streamAINewsSummary(item.title, item.desc);
@@ -1870,22 +2355,22 @@
                         <p>No valid LLM API key detected in Local Storage.</p>
                         <button class="btn-glow" style="margin-top:20px;" onclick="openSettings()">Configure Settings Now</button>
                     </div>
-                `;
+                    `;
                 return;
             }
 
             const prompt = `You are an elite financial news analyst for Aurion Terminal.
 Provide a structured, insightful summary and impact analysis of this news article.
 
-Title: ${title}
-Content: ${desc}
+                    Title: ${title}
+                Content: ${desc}
 
 Format your response EXACTLY as follows:
-**Executive Summary:**
-• [1-2 sentences summarizing the core event]
+** Executive Summary:**
+•[1 - 2 sentences summarizing the core event]
 
-**Market Impact & Key Takeaways:**
-• [3-4 bullet points detailing potential impact on specific sectors, institutional sentiment, or broader market indices]
+                    ** Market Impact & Key Takeaways:**
+•[3 - 4 bullet points detailing potential impact on specific sectors, institutional sentiment, or broader market indices]
 
 Keep it highly concise, professional, and analytical.`;
 
@@ -1942,15 +2427,20 @@ Keep it highly concise, professional, and analytical.`;
         // --- P6: SETTINGS API & AUTOCOMPLETE ---
         window.openSettings = function () {
             document.getElementById('gemini-key-input').value = localStorage.getItem('aurion_llm_key') || '';
-            document.getElementById('settings-overlay').classList.add('active');
+            document.getElementById('settings-overlay').style.display = 'flex';
         }
         window.closeSettings = function () {
-            document.getElementById('settings-overlay').classList.remove('active');
+            document.getElementById('settings-overlay').style.display = 'none';
         }
         window.saveSettings = function () {
-            const val = document.getElementById('gemini-key-input').value.trim();
-            if (val) localStorage.setItem('aurion_llm_key', val);
-            else localStorage.removeItem('aurion_llm_key');
+            const k = document.getElementById('gemini-key-input').value.trim();
+            if (k) localStorage.setItem('aurion_llm_key', k);
+            closeSettings();
+        }
+
+        window.clearApiKey = function () {
+            localStorage.removeItem('aurion_llm_key');
+            document.getElementById('gemini-key-input').value = '';
             closeSettings();
         }
 
@@ -2001,7 +2491,56 @@ Keep it highly concise, professional, and analytical.`;
             if (!e.target.closest('.search-box')) {
                 document.getElementById('search-dropdown').classList.remove('active');
             }
+            if (!e.target.closest('#add-stock-input') && !e.target.closest('#add-stock-dropdown')) {
+                document.getElementById('add-stock-dropdown').classList.remove('active');
+            }
         });
+
+        window.handleAddStockSearch = function (e) {
+            const val = e.target.value;
+            // Get the last part after the last comma
+            const parts = val.split(',');
+            const currentPart = parts[parts.length - 1].trim().toUpperCase();
+            const dd = document.getElementById('add-stock-dropdown');
+
+            if (!currentPart || currentPart.length < 3) {
+                dd.classList.remove('active');
+                return;
+            }
+
+            const cleanT = currentPart.replace(/[^A-Z0-9]/g, '');
+            const matches = ALL_STOCKS.filter(x => x.t.includes(currentPart) || x.n.toUpperCase().includes(currentPart) || x.ac.includes(currentPart) || x.n.toUpperCase().replace(/[^A-Z0-9]/g, '').includes(cleanT)).slice(0, 5);
+
+            if (matches.length === 0) {
+                dd.classList.remove('active');
+                return;
+            }
+
+            dd.innerHTML = matches.map(m => {
+                const safeT = (m.t || '').replace(/'/g, "\\'");
+                return '<div class="sd-item" onclick="appendStockToInput(\'' + safeT + '\');">' +
+                    '<span class="sd-title">' + m.n + '</span>' +
+                    '<span class="sd-sym">' + (m.ltp ? '\u20b9' + m.ltp : m.t) + '</span>' +
+                    '</div>';
+            }).join('');
+            dd.classList.add('active');
+        }
+
+        window.appendStockToInput = function (stockSymbol) {
+            const input = document.getElementById('add-stock-input');
+            let parts = input.value.split(',');
+            parts.pop(); // Remove the currently typed partial word
+            parts.push(' ' + stockSymbol); // Add the selected symbol
+            input.value = parts.join(',').trim().replace(/^,/, '');
+
+            // Add comma and space for the next entry
+            if (!input.value.endsWith(', ')) {
+                input.value += ', ';
+            }
+
+            document.getElementById('add-stock-dropdown').classList.remove('active');
+            input.focus();
+        }
 
         // --- P7: AI STREAMING ENGINE ---
         let _aiAbortController = null; // Track active AI request
