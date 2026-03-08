@@ -92,6 +92,7 @@ setInterval(() => {
     });
     // CRITICAL FIX: Do NOT rebuild DOM — only update text values in place
     updateTickerValues();
+    updateRadarValues();   // keep radar prices in sync with ticker
 
     // Gauge Jitter logic
     const now = Date.now();
