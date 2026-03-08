@@ -134,18 +134,69 @@ function updateTickerValues() {
     });
 }
 
+let _dragSrcId = null;
+
 function createRadarTile(label, valStr, dataStateClass, isLiveObjKey = false, itemId = null) {
     const isLive = (isLiveObjKey && simPrices[isLiveObjKey] && simPrices[isLiveObjKey].open);
     const liveCls = isLive ? 'is-live' : '';
-    const action = isLiveObjKey ? `onclick="loadChartForTicker('${isLiveObjKey}')"` : `onclick="openRadarIntel('${label}', '${valStr}')" style="cursor:pointer;" title="View Macro Intel"`;
+    const action = isLiveObjKey ? `onclick="if(!window._rdragged)loadChartForTicker('${isLiveObjKey}')"` : `onclick="if(!window._rdragged)openRadarIntel('${label}', '${valStr}')" style="cursor:pointer;" title="View Macro Intel"`;
     const keyAttr = isLiveObjKey ? ` data-rtkey="${isLiveObjKey}"` : '';
     const ridAttr = itemId ? ` data-rid="${itemId}"` : '';
+    const dragAttr = itemId ? ' draggable="true"' : '';
     const delBtn = itemId ? `<button class="rt-del" onclick="event.stopPropagation();removeRadarItem('${itemId}')" title="Remove">&#x2715;</button>` : '';
-    return `<div class="rt ${dataStateClass} ${liveCls}" ${action}${keyAttr}${ridAttr}>
-        ${delBtn}
+    const dragHandle = itemId ? `<div class="rt-drag-handle" title="Drag to reorder">&#8942;&#8942;</div>` : '';
+    return `<div class="rt ${dataStateClass} ${liveCls}" ${action}${keyAttr}${ridAttr}${dragAttr}>
+        ${delBtn}${dragHandle}
         <div class="rt-l">${label}</div>
         <div class="rt-v">${valStr}</div>
     </div>`;
+}
+
+function _initRadarDrag(grid) {
+    grid.addEventListener('dragstart', e => {
+        const tile = e.target.closest('.rt[data-rid]');
+        if (!tile) return;
+        _dragSrcId = tile.getAttribute('data-rid');
+        window._rdragged = false;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', _dragSrcId);
+        setTimeout(() => tile.classList.add('rt-dragging'), 0);
+    });
+    grid.addEventListener('dragend', e => {
+        grid.querySelectorAll('.rt-dragging, .rt-drag-over').forEach(el => {
+            el.classList.remove('rt-dragging', 'rt-drag-over');
+        });
+        setTimeout(() => { window._rdragged = false; }, 80);
+    });
+    grid.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const tile = e.target.closest('.rt[data-rid]');
+        if (tile && tile.getAttribute('data-rid') !== _dragSrcId) {
+            grid.querySelectorAll('.rt-drag-over').forEach(el => el.classList.remove('rt-drag-over'));
+            tile.classList.add('rt-drag-over');
+        }
+    });
+    grid.addEventListener('dragleave', e => {
+        if (!grid.contains(e.relatedTarget)) {
+            grid.querySelectorAll('.rt-drag-over').forEach(el => el.classList.remove('rt-drag-over'));
+        }
+    });
+    grid.addEventListener('drop', e => {
+        e.preventDefault();
+        window._rdragged = true;
+        const tile = e.target.closest('.rt[data-rid]');
+        if (!tile) return;
+        const destId = tile.getAttribute('data-rid');
+        if (!destId || destId === _dragSrcId) return;
+        const srcIdx = activeRadarIds.indexOf(_dragSrcId);
+        const dstIdx = activeRadarIds.indexOf(destId);
+        if (srcIdx === -1 || dstIdx === -1) return;
+        activeRadarIds.splice(srcIdx, 1);
+        activeRadarIds.splice(dstIdx, 0, _dragSrcId);
+        _saveRadarIds();
+        renderRadar();
+    });
 }
 
 // Update radar live-price tiles in-place at jitter frequency (no DOM rebuild)
@@ -182,6 +233,7 @@ function renderRadar() {
     });
     rg.innerHTML = t.join('');
     _updateRadarCount();
+    _initRadarDrag(rg);
 }
 
 // --- TRACKED STOCKS ---

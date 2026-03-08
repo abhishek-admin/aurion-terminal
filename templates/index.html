@@ -818,6 +818,25 @@
         }
         .rt:hover .rt-del { display: flex; }
 
+        .rt-drag-handle {
+            position: absolute;
+            top: 3px; left: 4px;
+            font-size: 9px;
+            color: var(--text-muted);
+            opacity: 0;
+            line-height: 1;
+            letter-spacing: -2px;
+            pointer-events: none;
+            transition: opacity 0.15s;
+        }
+        .rt:hover .rt-drag-handle { opacity: 0.5; }
+        .rt.rt-dragging { opacity: 0.35; transform: scale(0.97) !important; }
+        .rt.rt-drag-over {
+            border-color: var(--cyan) !important;
+            background: rgba(6,182,212,0.1) !important;
+            transform: scale(1.04) !important;
+        }
+
         #radar-add-modal {
             display: none;
             position: fixed;
