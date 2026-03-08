@@ -674,6 +674,232 @@
             margin-top: 4px;
         }
 
+        /* --- STRESS INFO ICON --- */
+        .stress-info-icon {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            border: 1.5px solid var(--text-muted);
+            color: var(--text-muted);
+            font-size: 9px;
+            font-family: 'JetBrains Mono';
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+            user-select: none;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .stress-info-icon:hover { border-color: var(--cyan); color: var(--cyan); }
+
+        /* Floating tooltip — lives on <body>, never clipped by panel overflow */
+        #stress-floating-tip {
+            position: fixed;
+            display: none;
+            width: 268px;
+            background: var(--surface);
+            border: 1px solid rgba(0,240,255,0.3);
+            border-radius: 12px;
+            padding: 16px;
+            z-index: 99999;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,240,255,0.06);
+            pointer-events: none;
+        }
+        #stress-floating-tip.visible { display: block; }
+        #stress-floating-tip::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: var(--arrow-left, 50%);
+            transform: translateX(-50%);
+            border: 7px solid transparent;
+            border-bottom-color: rgba(0,240,255,0.3);
+        }
+        .stt-title {
+            font-family: 'JetBrains Mono';
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--cyan);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .stt-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-family: 'JetBrains Mono';
+            font-size: 10px;
+        }
+        .stt-row:last-of-type { border-bottom: none; }
+        .stt-row span:first-child { color: var(--text-muted); }
+        .stt-row span:last-child  { color: var(--text-luma); font-weight: 700; }
+        .stt-scale {
+            display: flex;
+            gap: 6px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .stt-scale-item {
+            flex: 1;
+            text-align: center;
+            font-family: 'JetBrains Mono';
+            font-size: 9px;
+            font-weight: 700;
+            padding: 5px 2px;
+            border-radius: 5px;
+            line-height: 1.6;
+        }
+
+        /* --- NSE COUNTDOWN --- */
+        #nse-countdown {
+            font-family: 'JetBrains Mono';
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #nse-countdown.nse-closed { color: var(--text-muted); }
+        #nse-countdown.nse-open   { color: var(--bull); }
+        .nse-open-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--bull);
+            animation: pulse 1s infinite alternate;
+            box-shadow: 0 0 6px var(--bull);
+            display: inline-block;
+        }
+
+        /* --- RADAR CUSTOMIZATION --- */
+        .radar-add-btn {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.18);
+            color: var(--cyan);
+            font-family: 'JetBrains Mono';
+            font-size: 13px;
+            font-weight: bold;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-left: 7px;
+            line-height: 1;
+            padding: 0;
+            vertical-align: middle;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .radar-add-btn:hover { background: rgba(6,182,212,0.12); border-color: var(--cyan); }
+
+        .rt-del {
+            position: absolute;
+            top: 3px; right: 3px;
+            width: 15px; height: 15px;
+            border: none;
+            border-radius: 50%;
+            background: var(--bear);
+            color: #fff;
+            font-size: 8px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            padding: 0;
+            z-index: 5;
+            font-family: 'JetBrains Mono';
+        }
+        .rt:hover .rt-del { display: flex; }
+
+        #radar-add-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .radar-modal-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            width: 580px;
+            max-height: 72vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: var(--shadow-glass);
+        }
+        .radar-modal-hdr {
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'JetBrains Mono';
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: var(--text-luma);
+            flex-shrink: 0;
+        }
+        .radar-modal-body { padding: 16px 22px; overflow-y: auto; flex: 1; }
+        .rcat-label {
+            font-family: 'JetBrains Mono';
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin: 14px 0 6px;
+        }
+        .rcat-label:first-child { margin-top: 0; }
+        .rcat-items { display: flex; flex-wrap: wrap; gap: 6px; }
+        .rcat-chip {
+            padding: 4px 11px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-full);
+            font-family: 'JetBrains Mono';
+            font-size: 10px;
+            cursor: pointer;
+            color: var(--text-luma);
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .rcat-chip:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.25); }
+        .rcat-chip.active {
+            background: rgba(6,182,212,0.08);
+            border-color: var(--cyan);
+            color: var(--cyan);
+            cursor: default;
+            opacity: 0.6;
+        }
+        #radar-toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(50px);
+            background: rgba(15,15,25,0.97);
+            border: 1px solid var(--border);
+            color: var(--text-luma);
+            font-family: 'JetBrains Mono';
+            font-size: 11px;
+            padding: 10px 22px;
+            border-radius: var(--radius-full);
+            z-index: 99999;
+            opacity: 0;
+            transition: opacity 0.25s, transform 0.25s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        #radar-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
         /* --- P2: RADAR --- */
         .radar-grid {
             display: grid;
@@ -1613,7 +1839,10 @@
         <!-- LEFT COLUMN -->
         <div class="col">
             <div class="panel p-top" style="height: 260px;">
-                <div class="p-head"><span>System Stress</span> <span style="color:var(--cyan)">LIVE</span></div>
+                <div class="p-head">
+                    <span>System Stress <span class="stress-info-icon" id="stress-info-btn">i</span></span>
+                    <span style="color:var(--cyan)">LIVE</span>
+                </div>
                 <div class="p-body gauge-module" style="position:relative">
                     <svg viewBox="0 0 200 110" style="width:200px; height:110px; overflow:visible;">
                         <defs>
@@ -1659,7 +1888,12 @@
         <!-- MID COLUMN -->
         <div class="col">
             <div class="panel" style="flex: 0 0 auto;">
-                <div class="p-head">Radar Multi-Factor Grid [21]</div>
+                <div class="p-head" style="justify-content:space-between;">
+                    <span>Radar Multi-Factor Grid [<span id="radar-count">21</span>]
+                        <button class="radar-add-btn" onclick="openRadarAddModal()" title="Add indicator">+</button>
+                    </span>
+                    <span id="nse-countdown" class="nse-closed"></span>
+                </div>
                 <div class="p-body" style="padding: 12px;">
                     <div class="radar-grid" id="radar-grid">
                         <div class="loader">Initializing Array...</div>
@@ -1829,6 +2063,66 @@
     <script src="/static/js/second-page.js"></script>
     <script src="/static/js/ai-engine.js"></script>
     <script src="/static/js/init.js"></script>
+
+    <!-- RADAR ADD INDICATOR MODAL -->
+    <div id="radar-add-modal" onclick="if(event.target===this)closeRadarAddModal()">
+        <div class="radar-modal-box">
+            <div class="radar-modal-hdr">
+                <span>ADD INDICATOR &mdash; <span id="radar-count-modal" style="color:var(--cyan)"></span> / 21 ACTIVE</span>
+                <span style="cursor:pointer; font-size:16px; color:var(--text-muted);" onclick="closeRadarAddModal()">&#x2715;</span>
+            </div>
+            <div class="radar-modal-body">
+                <div id="radar-catalog-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RADAR TOAST -->
+    <div id="radar-toast"></div>
+
+    <!-- Stress Index floating tooltip -->
+    <div id="stress-floating-tip">
+        <div class="stt-title">How is this calculated?</div>
+        <div class="stt-row"><span>VIX (US)</span><span>25%</span></div>
+        <div class="stt-row"><span>India VIX</span><span>20%</span></div>
+        <div class="stt-row"><span>Nifty % change</span><span>20%</span></div>
+        <div class="stt-row"><span>INR/USD move</span><span>15%</span></div>
+        <div class="stt-row"><span>Brent crude move</span><span>10%</span></div>
+        <div class="stt-row"><span>FII flow signal</span><span>10%</span></div>
+        <div class="stt-scale">
+            <div class="stt-scale-item" style="background:rgba(16,185,129,0.15);color:var(--bull);">0–33<br>CALM</div>
+            <div class="stt-scale-item" style="background:rgba(245,158,11,0.15);color:var(--accent);">34–66<br>ALERT</div>
+            <div class="stt-scale-item" style="background:rgba(244,63,94,0.15);color:var(--bear);">67–100<br>CRISIS</div>
+        </div>
+    </div>
+    <script>
+        (function () {
+            const btn = document.getElementById('stress-info-btn');
+            const tip = document.getElementById('stress-floating-tip');
+            if (!btn || !tip) return;
+            btn.addEventListener('mouseenter', function () {
+                const r = btn.getBoundingClientRect();
+                const tw = 268;
+                // Centre tooltip below the icon, flip left if too close to right edge
+                let left = r.left + r.width / 2 - tw / 2;
+                if (left + tw > window.innerWidth - 8) left = window.innerWidth - tw - 8;
+                if (left < 8) left = 8;
+                tip.style.left = left + 'px';
+                tip.style.top  = (r.bottom + 10) + 'px';
+                // Reposition the arrow to match actual icon centre
+                const arrowLeft = (r.left + r.width / 2) - left;
+                tip.style.setProperty('--arrow-left', arrowLeft + 'px');
+                tip.classList.add('visible');
+                btn.style.borderColor = 'var(--cyan)';
+                btn.style.color = 'var(--cyan)';
+            });
+            btn.addEventListener('mouseleave', function () {
+                tip.classList.remove('visible');
+                btn.style.borderColor = '';
+                btn.style.color = '';
+            });
+        })();
+    </script>
 </body>
 
 </html>
