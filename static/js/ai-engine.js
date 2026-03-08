@@ -16,7 +16,6 @@ async function streamAIReport(ticker) {
     const signal = _aiAbortController.signal;
 
     const key = localStorage.getItem('aurion_llm_key');
-    const tvc = document.getElementById('tv-container');
     const aic = document.getElementById('ai-content');
 
     if (!key) {
@@ -248,7 +247,7 @@ window.openRadarIntel = function (label, value) {
             <div style="font-size: 13px; margin-bottom: 6px; color: var(--text-luma); line-height: 1.5;">${n.title}</div>
             <div class="n-meta">
                 <span class="n-src">${n.source}</span>
-                <span class="n-badge b-${n.sentiment.toLowerCase() === 'bullish' ? 'bull' : (n.sentiment.toLowerCase() === 'bearish' ? 'bear' : 'neut')}">${n.sentiment}</span>
+                <span class="n-badge b-${n.sentiment.toLowerCase() === 'bullish' ? 'bull' : (n.sentiment.toLowerCase() === 'bearish' ? 'bear' : 'neutral')}">${n.sentiment}</span>
             </div>
         </div>
     `).join('');
@@ -483,11 +482,11 @@ window.loadStockReport = function (k, symbol, csvData) {
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
                             <span style="color: var(--text-muted);">50-Day SMA</span>
-                            <span style="font-family: 'JetBrains Mono'; color: var(--${sma50Status === 'ABOVE' ? 'bull' : 'bear'});">\\u20b9${dma50_val} (${sma50Status})</span>
+                            <span style="font-family: 'JetBrains Mono'; color: var(--${sma50Status === 'ABOVE' ? 'bull' : 'bear'});">₹${dma50_val} (${sma50Status})</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
                             <span style="color: var(--text-muted);">200-Day SMA</span>
-                            <span style="font-family: 'JetBrains Mono'; color: var(--${sma200Status === 'ABOVE' ? 'bull' : 'bear'});">\\u20b9${dma200_val} (${sma200Status})</span>
+                            <span style="font-family: 'JetBrains Mono'; color: var(--${sma200Status === 'ABOVE' ? 'bull' : 'bear'});">₹${dma200_val} (${sma200Status})</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
                             <span style="color: var(--text-muted);">RSI (14)</span>
@@ -495,11 +494,11 @@ window.loadStockReport = function (k, symbol, csvData) {
                         </div>
                         <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
                             <span style="color: var(--text-muted);">52W High</span>
-                            <span style="font-family: 'JetBrains Mono'; color: var(--bull);">\\u20b9${high52}</span>
+                            <span style="font-family: 'JetBrains Mono'; color: var(--bull);">₹${high52}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
                             <span style="color: var(--text-muted);">52W Low</span>
-                            <span style="font-family: 'JetBrains Mono'; color: var(--bear);">\\u20b9${low52}</span>
+                            <span style="font-family: 'JetBrains Mono'; color: var(--bear);">₹${low52}</span>
                         </div>
                     </div>
                 </div>
@@ -558,7 +557,7 @@ window.openNewsPage = function (idx) {
 
     document.getElementById('sp-left').innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-            <span class="badge b-${item.sentiment}">${item.sentiment.toUpperCase()}</span>
+            <span class="badge b-${item.sentiment === 'bullish' ? 'bull' : (item.sentiment === 'bearish' ? 'bear' : 'neutral')}">${item.sentiment.toUpperCase()}</span>
             <span style="font-family: 'JetBrains Mono'; font-size: 12px; color: var(--text-muted);">${formatExactDate(item.ts)}</span>
         </div>
         <h1 style="font-family:'Outfit'; font-size:32px; color:var(--text-luma); margin-bottom:24px; line-height:1.2;">${item.title}</h1>

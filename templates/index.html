@@ -25,6 +25,7 @@
 
             --text-luma: #fdfdfd;
             --text-muted: #8b8e9e;
+            --text-base: #fdfdfd;
 
             --accent: #e2ab34;
             /* Gold/Amber */
@@ -88,6 +89,23 @@
         :root.theme-light .tk-badge {
             color: #555 !important;
             border-color: rgba(0, 0, 0, 0.15) !important;
+        }
+
+        :root.theme-light .tk.is-open .tk-badge {
+            animation: tk-live-blink-light 0.45s step-end infinite !important;
+        }
+
+        @keyframes tk-live-blink-light {
+            0%, 100% {
+                background: rgba(5, 150, 105, 0.12);
+                color: #059669;
+                box-shadow: none;
+            }
+            50% {
+                background: #059669;
+                color: #fff;
+                box-shadow: 0 0 8px rgba(5, 150, 105, 0.5);
+            }
         }
 
         :root.theme-light .search-box {
@@ -421,6 +439,33 @@
             background: rgba(16, 185, 129, 0.15);
             color: var(--bull);
             box-shadow: inset 0 0 4px rgba(16, 185, 129, 0.3);
+            animation: tk-live-blink 0.45s step-end infinite;
+        }
+
+        .tk.is-open .tk-v {
+            animation: tk-price-glow 0.45s step-end infinite;
+        }
+
+        @keyframes tk-live-blink {
+            0%, 100% {
+                background: rgba(16, 185, 129, 0.15);
+                color: var(--bull);
+                box-shadow: inset 0 0 4px rgba(16, 185, 129, 0.3);
+            }
+            50% {
+                background: var(--bull);
+                color: #000;
+                box-shadow: 0 0 8px rgba(16, 185, 129, 0.7);
+            }
+        }
+
+        @keyframes tk-price-glow {
+            0%, 100% {
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+            }
+            50% {
+                text-shadow: 0 0 10px rgba(16, 185, 129, 0.6), 0 0 20px rgba(16, 185, 129, 0.2);
+            }
         }
 
         .tk:not(.is-open) .tk-badge {
@@ -497,6 +542,26 @@
             background: rgba(255, 255, 255, 0.12);
             border-color: rgba(255, 255, 255, 0.2);
             transform: translateY(-1px);
+        }
+
+        .btn-cancel {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-family: 'JetBrains Mono';
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding: 12px 24px;
+            transition: all 0.2s var(--easing);
+        }
+
+        .btn-cancel:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            color: var(--text-luma);
+            background: rgba(255, 255, 255, 0.06);
         }
 
         /* --- MAIN GRID --- */
@@ -799,6 +864,68 @@
             background: rgba(139, 142, 158, 0.1);
             color: var(--text-muted);
             border: 1px solid rgba(139, 142, 158, 0.2);
+        }
+
+        .b-neut {
+            background: rgba(139, 142, 158, 0.1);
+            color: var(--text-muted);
+            border: 1px solid rgba(139, 142, 158, 0.2);
+        }
+
+        .b-accent {
+            background: rgba(226, 171, 52, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(226, 171, 52, 0.2);
+        }
+
+        .b-cyan {
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--cyan);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        /* --- SCROLL TO TOP BUTTON --- */
+        .scroll-top-btn {
+            position: absolute;
+            bottom: 14px;
+            right: 14px;
+            background: rgba(6, 182, 212, 0.12);
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            font-family: 'JetBrains Mono';
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 5px 10px;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 5px;
+            z-index: 10;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 12px rgba(6, 182, 212, 0.2);
+            backdrop-filter: blur(8px);
+        }
+
+        .scroll-top-btn.visible {
+            display: flex;
+        }
+
+        .scroll-top-btn:hover {
+            background: rgba(6, 182, 212, 0.25);
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .news-refresh-dot {
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--bull);
+            animation: pulse 1.5s infinite alternate;
+            margin-right: 2px;
         }
 
         /* --- P4: ALERTS --- */
@@ -1143,23 +1270,9 @@
         }
 
         /* --- P6: SETTINGS & SEARCH AUTOCOMPLETE --- */
-        .search-input {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border);
-            color: var(--text-luma);
-            padding: 8px 32px 8px 16px;
-            border-radius: 20px;
-            font-family: 'JetBrains Mono';
-            font-size: 12px;
-            width: 130px;
-            transition: all 0.3s ease;
-        }
-
         .search-input:focus {
             width: 180px;
-            border-color: var(--cyan);
             outline: none;
-            background: rgba(0, 0, 0, 0.6);
         }
 
         #settings-overlay {
@@ -1523,11 +1636,23 @@
                     <div class="g-lbl">INDEX VALUE</div>
                 </div>
             </div>
-            <div class="panel p-bot">
-                <div class="p-head">Live News Feed</div>
+            <div class="panel p-bot" style="position:relative;">
+                <div class="p-head" style="justify-content:space-between;">
+                    <span>Live News Feed</span>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-family:'JetBrains Mono'; font-size:9px; color:var(--text-muted); display:flex; align-items:center; gap:4px; letter-spacing:0.3px;">
+                            <span class="news-refresh-dot"></span>auto-refresh 60s
+                        </span>
+                        <button class="btn" id="news-refresh-btn" onclick="pollNews()" title="Refresh News Now" style="font-size:13px; width:26px; height:26px;">↻</button>
+                    </div>
+                </div>
                 <div class="p-body news-list" id="news-pane">
                     <div class="loader">Loading Intel...</div>
                 </div>
+                <button class="scroll-top-btn" id="news-scroll-top"
+                    onclick="document.getElementById('news-pane').scrollTo({top:0,behavior:'smooth'})">
+                    ▲ TOP
+                </button>
             </div>
         </div>
 
@@ -1580,9 +1705,9 @@
                 <div class="p-head">Signal Alerts</div>
                 <div class="p-body" id="alerts-pane"></div>
             </div>
-            <div class="panel p-bot">
+            <div class="panel p-bot" style="position:relative;">
                 <div class="p-head">Analyst Sentiment Stream</div>
-                <div class="p-body">
+                <div class="p-body" id="sentiment-body">
                     <div class="sent-bar-wrap" id="s-bar"></div>
                     <div class="sent-stats">
                         <span id="s-bull" style="color:var(--bull)">0% BULL</span>
@@ -1591,6 +1716,10 @@
                     </div>
                     <div id="s-list" style="display:flex; flex-direction:column; gap:4px;"></div>
                 </div>
+                <button class="scroll-top-btn" id="sentiment-scroll-top"
+                    onclick="document.getElementById('sentiment-body').scrollTo({top:0,behavior:'smooth'})">
+                    ▲ TOP
+                </button>
             </div>
         </div>
     </div>
@@ -1641,7 +1770,7 @@
             <div style="display:flex; gap:12px; margin-top:24px;">
                 <button class="btn-glow" style="flex:1; text-align:center" onclick="saveTrackedStocks()">Update Tracking
                     Vector</button>
-                <button class="btn" style="padding:12px 24px;" onclick="closeAddStockModal()">Cancel</button>
+                <button class="btn-cancel" onclick="closeAddStockModal()">Cancel</button>
             </div>
         </div>
     </div>
@@ -1661,7 +1790,7 @@
             <div style="display:flex; gap:12px; margin-top:24px;">
                 <button class="btn-glow" style="flex:1; text-align:center" onclick="saveSettings()">Save
                     Configuration</button>
-                <button class="btn" style="padding:12px 24px;" onclick="closeSettings()">Cancel</button>
+                <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
             </div>
 
             <!-- Danger Zone -->
