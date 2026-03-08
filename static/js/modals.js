@@ -4,9 +4,25 @@
 // =============================================
 
 // --- SETTINGS ---
+const _PROVIDER_PLACEHOLDERS = {
+    gemini: 'AIzaSy...',
+    anthropic: 'sk-ant-...',
+    openai: 'sk-...',
+    xai: 'xai-...',
+    groq: 'gsk_...'
+};
+
+window.updateApiKeyPlaceholder = function () {
+    const provider = document.getElementById('llm-provider-select').value;
+    document.getElementById('gemini-key-input').placeholder = _PROVIDER_PLACEHOLDERS[provider] || 'API Key...';
+}
+
 window.openSettings = function () {
     const key = localStorage.getItem('aurion_llm_key') || '';
+    const provider = localStorage.getItem('aurion_llm_provider') || 'gemini';
     document.getElementById('gemini-key-input').value = key;
+    document.getElementById('llm-provider-select').value = provider;
+    updateApiKeyPlaceholder();
 
     // Show/hide the danger zone based on whether a key exists
     const dangerZone = document.getElementById('settings-danger-zone');
@@ -23,7 +39,9 @@ window.closeSettings = function () {
 
 window.saveSettings = function () {
     const k = document.getElementById('gemini-key-input').value.trim();
+    const provider = document.getElementById('llm-provider-select').value;
     if (k) localStorage.setItem('aurion_llm_key', k);
+    localStorage.setItem('aurion_llm_provider', provider);
     closeSettings();
 }
 

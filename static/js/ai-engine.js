@@ -6,6 +6,69 @@
 
 let _aiAbortController = null;
 
+// --- UNIFIED PROVIDER ROUTER ---
+// Supports: gemini, anthropic, openai, xai, groq
+async function _callProvider(prompt, useSearch, signal) {
+    const key = localStorage.getItem('aurion_llm_key');
+    const provider = localStorage.getItem('aurion_llm_provider') || 'gemini';
+
+    if (provider === 'gemini') {
+        const body = {
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.3 }
+        };
+        if (useSearch) body.tools = [{ googleSearch: {} }];
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,
+            { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal, body: JSON.stringify(body) }
+        );
+        if (!response.ok) throw new Error('API Request Failed');
+        const data = await response.json();
+        if (!data.candidates?.[0]?.content?.parts?.[0]?.text) throw new Error('Invalid response from Gemini');
+        return data.candidates[0].content.parts[0].text;
+    }
+
+    if (provider === 'anthropic') {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+                'x-api-key': key,
+                'anthropic-version': '2023-06-01',
+                'anthropic-dangerous-direct-browser-access': 'true',
+                'Content-Type': 'application/json'
+            },
+            signal,
+            body: JSON.stringify({
+                model: 'claude-sonnet-4-6',
+                max_tokens: 2048,
+                messages: [{ role: 'user', content: prompt }]
+            })
+        });
+        if (!response.ok) throw new Error('API Request Failed');
+        const data = await response.json();
+        if (!data.content?.[0]?.text) throw new Error('Invalid response from Anthropic');
+        return data.content[0].text;
+    }
+
+    // OpenAI-compatible: openai, xai, groq
+    const providerConfig = {
+        openai: { url: 'https://api.openai.com/v1/chat/completions', model: 'gpt-4o' },
+        xai:    { url: 'https://api.x.ai/v1/chat/completions', model: 'grok-3' },
+        groq:   { url: 'https://api.groq.com/openai/v1/chat/completions', model: 'llama-3.3-70b-versatile' }
+    };
+    const cfg = providerConfig[provider];
+    const response = await fetch(cfg.url, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+        signal,
+        body: JSON.stringify({ model: cfg.model, messages: [{ role: 'user', content: prompt }], temperature: 0.3 })
+    });
+    if (!response.ok) throw new Error('API Request Failed');
+    const data = await response.json();
+    if (!data.choices?.[0]?.message?.content) throw new Error('Invalid response from provider');
+    return data.choices[0].message.content;
+}
+
 // --- STOCK REPORT ---
 async function streamAIReport(ticker) {
     if (_aiAbortController) {
@@ -103,26 +166,7 @@ Keep each bullet point concise (1-2 lines max). Be specific with numbers. Use th
     }
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            signal: signal,
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                tools: [{ googleSearch: {} }],
-                generationConfig: { temperature: 0.3 }
-            })
-        });
-
-        if (!response.ok) throw new Error('API Request Failed');
-
-        const data = await response.json();
-        let fullText = "";
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
-            fullText = data.candidates[0].content.parts[0].text;
-        } else {
-            throw new Error('Invalid format returned from Gemini');
-        }
+        const fullText = await _callProvider(prompt, true, signal);
 
         let htmlText = fullText
             .replace(/\*\*(.*?)\*\*/g, '<h3 style="color:var(--cyan); font-family:JetBrains Mono; font-size:13px; margin-top:20px; margin-bottom:8px; letter-spacing:1px; text-transform:uppercase;">$1</h3>')
@@ -137,7 +181,7 @@ Keep each bullet point concise (1-2 lines max). Be specific with numbers. Use th
         aic.innerHTML = `
             <div style="padding: 20px; color:var(--bear);">
                 <h3>Connection Interrupted</h3>
-                <p>Matrix failure attempting to reach Google Generative Language API. Verify your API key in Settings.</p>
+                <p>Failed to reach the LLM API. Verify your API key and selected provider in Settings.</p>
             </div>
         `;
     }
@@ -182,25 +226,7 @@ Format your response EXACTLY as follows:
 Keep it highly concise, professional, and analytical.`;
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            signal: signal,
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { temperature: 0.2 }
-            })
-        });
-
-        if (!response.ok) throw new Error('API Request Failed');
-
-        const data = await response.json();
-        let fullText = "";
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
-            fullText = data.candidates[0].content.parts[0].text;
-        } else {
-            throw new Error('Invalid format returned from Gemini');
-        }
+        const fullText = await _callProvider(prompt, false, signal);
 
         let htmlText = fullText
             .replace(/\*\*(.*?)\*\*/g, '<h3 style="color:var(--cyan); font-family:JetBrains Mono; font-size:13px; margin-top:20px; margin-bottom:8px; letter-spacing:1px; text-transform:uppercase;">$1</h3>')
@@ -219,7 +245,7 @@ Keep it highly concise, professional, and analytical.`;
         aic.innerHTML = `
             <div style="padding: 20px; color:var(--bear);">
                 <h3>Analysis Interrupted</h3>
-                <p>Matrix failure attempting to reach Google Generative Language API.</p>
+                <p>Failed to reach the LLM API. Verify your API key and selected provider in Settings.</p>
             </div>
         `;
     }
@@ -331,25 +357,7 @@ Format your response EXACTLY as the sections below with bullet points.
 Keep each bullet point concise (1-2 lines max). Provide actionable intelligence.`;
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            signal: signal,
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { temperature: 0.3 }
-            })
-        });
-
-        if (!response.ok) throw new Error('API Request Failed');
-
-        const data = await response.json();
-        let fullText = "";
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
-            fullText = data.candidates[0].content.parts[0].text;
-        } else {
-            throw new Error('Invalid format returned from Gemini');
-        }
+        const fullText = await _callProvider(prompt, false, signal);
 
         let htmlText = fullText
             .replace(/\*\*(.*?)\*\*/g, '<h3 style="color:var(--cyan); font-family:JetBrains Mono; font-size:13px; margin-top:20px; margin-bottom:8px; letter-spacing:1px; text-transform:uppercase;">$1</h3>')
@@ -361,7 +369,7 @@ Keep each bullet point concise (1-2 lines max). Provide actionable intelligence.
 
     } catch (error) {
         if (error.name === 'AbortError') return;
-        aic.innerHTML = `<div style="padding: 20px; color:var(--bear);"><h3>Analysis Interrupted</h3><p>Matrix failure attempting to reach Google Generative Language API.</p></div>`;
+        aic.innerHTML = `<div style="padding: 20px; color:var(--bear);"><h3>Analysis Interrupted</h3><p>Failed to reach the LLM API. Verify your API key and selected provider in Settings.</p></div>`;
     }
 }
 
@@ -505,12 +513,13 @@ window.loadStockReport = function (k, symbol, csvData) {
             </div>
 
             <div style="background: rgba(40, 0, 0, 0.2); border: 1px solid var(--bear); padding: 24px; border-radius: 16px; margin-bottom: 40px;">
-                <h3 style="color: var(--bear); margin-bottom: 16px; font-family: 'JetBrains Mono'; font-size: 14px; display: flex; align-items: center; gap: 8px;"><span>⚠️</span> CORPORATE GOVERNANCE ALERTS</h3>
-                <ul style="color: var(--text-muted); display: flex; flex-direction: column; gap: 12px; margin-left: 20px;">
-                    <li><strong>Leadership Change:</strong> Chief Financial Officer stepped down effective last month. Interim CFO appointed from internal board.</li>
-                    <li><strong>Regulatory Requirement:</strong> New SEC/SEBI compliance requirements for environmental disclosures taking effect Q2 2026. Audit underway.</li>
-                    <li><strong>Board Member Exit:</strong> Independent Director resigned citing personal reasons. Replacement search ongoing.</li>
-                </ul>
+                <h3 style="color: var(--bear); margin-bottom: 16px; font-family: 'JetBrains Mono'; font-size: 14px; display: flex; align-items: center; gap: 8px;"><span>&#9888;</span> CORPORATE GOVERNANCE ALERTS</h3>
+                <div id="gov-alerts-content" style="color: var(--text-muted); font-size: 12px;">
+                    <div style="display:flex; align-items:center; gap:8px; font-family:'JetBrains Mono';">
+                        <span style="width:8px;height:8px;border:1px solid var(--cyan);border-top:1px solid transparent;border-radius:50%;display:inline-block;animation:spin 1s linear infinite;"></span>
+                        Scanning governance signals for ${k}...
+                    </div>
+                </div>
             </div>
         </div>
             `;
@@ -547,6 +556,105 @@ window.loadStockReport = function (k, symbol, csvData) {
         `;
     document.getElementById('second-page').classList.add('active');
     streamAIReport(k);
+    loadGovernanceAlerts(k);   // non-blocking, fills gov-alerts-content independently
+}
+
+// --- CORPORATE GOVERNANCE ALERTS (stock-specific, live) ---
+async function loadGovernanceAlerts(k) {
+    const container = document.getElementById('gov-alerts-content');
+    if (!container) return;
+
+    const GOV_KW = ['board', 'director', 'ceo', 'cfo', 'coo', 'sebi', 'compliance',
+        'promoter', 'pledge', 'insider', 'regulatory', 'penalty', 'fine', 'fraud',
+        'audit', 'auditor', 'governance', 'stake', 'shareholding', 'management',
+        'resign', 'appoint', 'chairman', 'legal', 'lawsuit', 'probe', 'investigation'];
+
+    const stockObj = ALL_STOCKS.find(s => s.t === k);
+    const stockName = stockObj ? stockObj.n.toLowerCase() : k.toLowerCase();
+    const stockKey  = k.toLowerCase();
+    // Use first meaningful word of company name for matching (e.g. "titan" from "titan company ltd")
+    const nameWord  = stockName.split(' ')[0];
+
+    // 1. Immediately surface any governance-related news from the cache
+    const govNews = newsDataCache.filter(n => {
+        const text = (n.title + ' ' + n.desc).toLowerCase();
+        const mentionsStock = text.includes(stockKey) || text.includes(nameWord);
+        const isGov = GOV_KW.some(kw => text.includes(kw));
+        return mentionsStock && isGov;
+    }).slice(0, 3);
+
+    let newsHtml = '';
+    if (govNews.length > 0) {
+        newsHtml = govNews.map(n => `
+            <div onclick="openNewsPage(${newsDataCache.indexOf(n)})" style="cursor:pointer; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                <div style="color:var(--text-luma); font-size:12px; line-height:1.5; margin-bottom:3px;">${n.title}</div>
+                <div style="font-family:'JetBrains Mono'; font-size:9px; color:var(--text-muted);">${n.source} · ${formatExactTime(n.ts)}</div>
+            </div>`).join('');
+    }
+
+    // 2. If no LLM key, just show news results (or a no-data message)
+    const key = localStorage.getItem('aurion_llm_key');
+    if (!key) {
+        container.innerHTML = govNews.length > 0
+            ? newsHtml
+            : `<div style="color:var(--text-muted); font-size:12px;">No recent governance signals in current news cycle. <span onclick="openSettings()" style="color:var(--cyan); cursor:pointer; text-decoration:underline;">Add AI key</span> for deeper analysis.</div>`;
+        return;
+    }
+
+    // 3. Show news immediately + AI loading indicator
+    container.innerHTML = newsHtml + `
+        <div id="_gov_ai_loading" style="font-family:'JetBrains Mono'; font-size:10px; color:var(--cyan); margin-top:${govNews.length > 0 ? '12' : '0'}px; display:flex; align-items:center; gap:8px;">
+            <span style="width:7px;height:7px;border:1px solid var(--cyan);border-top:1px solid transparent;border-radius:50%;display:inline-block;animation:spin 1s linear infinite;"></span>
+            AI governance scan running...
+        </div>`;
+
+    // 4. LLM call — governance-only prompt, no grounding needed
+    const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    const prompt = `You are a corporate governance analyst for an Indian equity terminal called Aurion.
+List ONLY the latest real corporate governance alerts for: ${k}${stockObj ? ' (' + stockObj.n + ')' : ''} — NSE/BSE listed company.
+Today: ${today}
+
+RULES:
+- Return ONLY factual events. Do NOT fabricate or use generic placeholders.
+- If no notable governance issues exist, respond with exactly: NO_ALERTS
+- Focus on: board/director changes, CEO/CFO exits, SEBI orders, promoter pledging, insider trading probes, auditor resignations, regulatory penalties.
+- Format EXACTLY as bullet points:
+• [Category]: [What happened — 1 sentence with specific details/dates if known]
+
+Maximum 4 bullets. Be specific to ${k} only.`;
+
+    try {
+        const text = await _callProvider(prompt, false, new AbortController().signal);
+        const loader = document.getElementById('_gov_ai_loading');
+        if (loader) loader.remove();
+
+        if (text.trim().includes('NO_ALERTS') || text.trim().length < 20) {
+            if (govNews.length === 0) {
+                container.innerHTML = `<div style="color:var(--text-muted); font-size:12px;">No material governance alerts found for ${k}.</div>`;
+            }
+            return;
+        }
+
+        const lines = text.split('\n').filter(l => l.trim().match(/^[•\*\-]/)).slice(0, 4);
+        if (lines.length === 0) {
+            if (govNews.length === 0) container.innerHTML = `<div style="color:var(--text-muted); font-size:12px;">No material governance alerts found for ${k}.</div>`;
+            return;
+        }
+
+        const aiHtml = `
+            <div style="font-family:'JetBrains Mono'; font-size:9px; color:var(--cyan); margin-top:${govNews.length > 0 ? '12' : '0'}px; margin-bottom:10px; letter-spacing:1px;">AI GOVERNANCE SCAN · ${k}</div>
+            <ul style="display:flex; flex-direction:column; gap:10px; margin-left:16px;">
+                ${lines.map(l => `<li style="color:var(--text-muted); font-size:12px; line-height:1.5;">
+                    ${l.replace(/^[•\*\-]\s*/, '').replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--text-luma);">$1</strong>')}
+                </li>`).join('')}
+            </ul>`;
+
+        container.innerHTML = newsHtml + aiHtml;
+
+    } catch (e) {
+        const loader = document.getElementById('_gov_ai_loading');
+        if (loader) loader.remove();
+    }
 }
 
 window.openNewsPage = function (idx) {
