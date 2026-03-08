@@ -155,7 +155,7 @@ window.openSentimentPage = function (idx) {
 
     const cleanT = k.replace(/[^A-Z0-9]/g, '');
     const csvStock = ALL_STOCKS.find(s => s.t === k || s.n.toUpperCase().includes(k) || s.n.toUpperCase().replace(/[^A-Z0-9]/g, '').includes(cleanT));
-    window.loadStockReport(k, `NSE:${k} `, csvStock);
+    window.loadStockReport(k, `NSE:${k}`, csvStock);
 }
 
 window.searchAndOpenTicker = function (val) {
