@@ -57,9 +57,152 @@
             --border-glow: rgba(0, 0, 0, 0.2);
             --text-luma: #111111;
             --text-muted: #555555;
+            --text-base: #111111;
             --cyan: #0284c7;
-            /* Darker cyan for light mode */
+            --bull: #059669;
+            --bear: #dc2626;
+            --neutral: #475569;
+            --accent: #d97706;
             --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.05);
+            --blur: blur(20px);
+        }
+
+        /* Light theme: Topbar */
+        :root.theme-light .topbar {
+            background: rgba(255, 255, 255, 0.92) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+        }
+
+        :root.theme-light .logo {
+            color: #111 !important;
+        }
+
+        :root.theme-light .clock {
+            color: #333 !important;
+        }
+
+        :root.theme-light .tk-l {
+            color: #333 !important;
+        }
+
+        :root.theme-light .tk-badge {
+            color: #555 !important;
+            border-color: rgba(0, 0, 0, 0.15) !important;
+        }
+
+        :root.theme-light .search-box {
+            background: rgba(0, 0, 0, 0.05) !important;
+            border-color: rgba(0, 0, 0, 0.15) !important;
+        }
+
+        :root.theme-light .search-input {
+            color: #111 !important;
+        }
+
+        :root.theme-light .search-input::placeholder {
+            color: #888 !important;
+        }
+
+        :root.theme-light .tools button,
+        :root.theme-light .tools span {
+            color: #333 !important;
+        }
+
+        /* Light theme: Status bar */
+        :root.theme-light .statusbar {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            color: #444 !important;
+        }
+
+        /* Light theme: Radar Tiles */
+        :root.theme-light .rt {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: rgba(0, 0, 0, 0.12);
+        }
+
+        :root.theme-light .rt:hover {
+            background: rgba(0, 0, 0, 0.06);
+            border-color: rgba(0, 0, 0, 0.25);
+        }
+
+        :root.theme-light .rt.is-live {
+            animation: live-blink-bg-light 1s step-end infinite !important;
+        }
+
+        :root.theme-light .rt.is-live .rt-v {
+            animation: live-blink-text-light 1s step-end infinite !important;
+        }
+
+        /* Light theme: Sentiment dots — bigger, bolder, no glow */
+        :root.theme-light .ss-dot {
+            flex: 0 0 10px !important;
+            height: 10px !important;
+            box-shadow: none !important;
+            border: 2px solid currentColor !important;
+        }
+
+        /* Light theme: Badge colors stay punchy */
+        :root.theme-light .b-bull,
+        :root.theme-light .badge.b-bull {
+            background: rgba(5, 150, 105, 0.15) !important;
+            color: #059669 !important;
+            font-weight: 700 !important;
+        }
+
+        :root.theme-light .b-bear,
+        :root.theme-light .badge.b-bear {
+            background: rgba(220, 38, 38, 0.12) !important;
+            color: #dc2626 !important;
+            font-weight: 700 !important;
+        }
+
+        :root.theme-light .b-neut,
+        :root.theme-light .badge.b-neut {
+            background: rgba(71, 85, 105, 0.12) !important;
+            color: #475569 !important;
+            font-weight: 700 !important;
+        }
+
+        /* Light theme: Panel headers */
+        :root.theme-light .p-head {
+            color: #111 !important;
+            border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+        }
+
+        /* Light theme: Sector sparklines */
+        :root.theme-light .s-spark.up path {
+            stroke: #059669 !important;
+        }
+
+        :root.theme-light .s-spark.dn path {
+            stroke: #dc2626 !important;
+        }
+
+        @keyframes live-blink-bg-light {
+
+            0%,
+            100% {
+                background: rgba(255, 255, 255, 0.8);
+            }
+
+            50% {
+                background: #fef3c7;
+                border-color: #d97706;
+            }
+        }
+
+        @keyframes live-blink-text-light {
+
+            0%,
+            100% {
+                color: inherit;
+            }
+
+            50% {
+                color: #92400e;
+                text-shadow: none;
+            }
         }
 
         * {
@@ -1149,59 +1292,106 @@
 
         /* --- MOBILE RESPONSIVENESS --- */
         @media (max-width: 1024px) {
+            body {
+                overflow-y: auto;
+                height: auto;
+            }
+
             .workspace {
                 display: flex !important;
                 flex-direction: column;
-                gap: 24px;
-                height: auto;
-                overflow-y: auto;
-            }
-
-            body {
-                overflow-y: auto;
+                gap: 16px;
+                padding: 12px;
+                height: auto !important;
+                min-height: auto;
+                overflow-y: visible;
             }
 
             .col {
-                height: auto;
-                padding-bottom: 20px;
+                display: contents !important;
             }
 
-            .col:nth-child(1) {
+            /* ============================
+               MOBILE PANEL ORDER
+               User wants: News Feed → Radar → Sectors → Stock AI → Alerts → Sentiment
+               Using display:contents on .col to flatten everything, 
+               then ordering each panel individually.
+            ============================ */
+
+            /* System Stress Gauge */
+            .col:nth-child(1)>.panel.p-top {
                 order: 1;
+                height: auto !important;
+                min-height: 200px;
             }
 
-            /* Left: News + Gauge */
-            .col:nth-child(2) {
+            /* Live News Feed */
+            .col:nth-child(1)>.panel.p-bot {
                 order: 2;
+                min-height: 300px;
+                max-height: 400px;
             }
 
-            /* Mid: Radar + Sectors + Stocks */
-            .col:nth-child(3) {
+            /* Radar Multi-Factor Grid */
+            .col:nth-child(2)>.panel:first-child {
                 order: 3;
             }
 
-            /* Right: Alerts + Sentiment — PUSHED TO BOTTOM */
-
-            div[style*="flex: 1 1 auto; display: flex; gap: 10px; min-height: 280px;"] {
+            /* Sector + Stock AI container (unwrap into stacked) */
+            .col:nth-child(2)>div[style*="flex: 1 1 auto"] {
+                order: 4;
+                display: flex !important;
                 flex-direction: column !important;
+                gap: 16px;
+                min-height: auto !important;
             }
 
-            .panel {
+            /* Signal Alerts */
+            .col:nth-child(3)>.panel.p-top {
+                order: 5;
+                height: auto !important;
+                min-height: 200px;
+            }
+
+            /* Analyst Sentiment Stream */
+            .col:nth-child(3)>.panel.p-bot {
+                order: 6;
                 min-height: 300px;
             }
 
+            /* All panels get proper height */
+            .panel {
+                flex: 0 0 auto !important;
+                min-height: 250px;
+                height: auto !important;
+            }
+
+            /* Radar grid: 4 columns on tablet, 3 on narrow phone */
+            .radar-grid {
+                grid-template-columns: repeat(4, 1fr) !important;
+                grid-template-rows: auto !important;
+            }
+
+            /* Second page / modal */
             #second-page {
                 overflow-y: auto;
             }
 
-            #sp-grid {
-                grid-template-columns: 1fr;
+            .sp-body {
+                flex-direction: column;
             }
 
+            .sp-left {
+                flex: 0 0 auto !important;
+                width: 100%;
+            }
+
+            /* Topbar wraps nicely */
             .topbar {
                 flex-wrap: wrap;
                 height: auto;
-                padding: 12px;
+                padding: 8px 12px;
+                gap: 6px;
             }
 
             .clock {
@@ -1211,22 +1401,48 @@
             .tickers {
                 order: 3;
                 width: 100%;
-                margin-top: 12px;
                 flex: 0 0 100%;
+                margin-top: 6px;
             }
 
             .tools {
                 margin-left: auto;
             }
+
+            /* Status bar */
+            .statusbar {
+                position: relative;
+            }
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 600px) {
+            .radar-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+
             .search-input {
-                width: 100px;
+                width: 80px;
             }
 
             .search-input:focus {
-                width: 140px;
+                width: 120px;
+            }
+
+            .topbar {
+                padding: 6px 8px;
+            }
+
+            .logo {
+                font-size: 14px;
+            }
+
+            .settings-modal {
+                width: 90vw !important;
+                padding: 20px !important;
+            }
+
+            .sp-left {
+                padding: 16px !important;
             }
         }
     </style>
