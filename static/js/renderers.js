@@ -11,69 +11,69 @@ let _tickerBuilt = false;
 // =============================================
 const RADAR_CATALOG = {
     // --- Global Rates & Bonds ---
-    FED_RATE:    { label:'FED RATE',    cat:'Global Rates',    getValue:d=>'5.50%',                                                            getClass:d=>'c-neutral' },
-    US10Y:       { label:'US 10Y',      cat:'Global Rates',    getValue:d=>formatVal(_rv('US10Y',(d.US10Y||{}).val))+'%',                       getClass:d=>(d.US10Y||{}).val>4.5?'c-bear':((d.US10Y||{}).val<3.5?'c-bull':'c-neutral'), liveKey:'US10Y' },
-    US2Y:        { label:'US 2Y',       cat:'Global Rates',    getValue:d=>'4.85%',                                                            getClass:d=>'c-neutral' },
-    INDIA10Y:    { label:'INDIA 10Y',   cat:'India Macro',     getValue:d=>'7.02%',                                                            getClass:d=>'c-cyan' },
-    RBI_RATE:    { label:'RBI RATE',    cat:'India Macro',     getValue:d=>(d.RBI_POLICY||{}).rate?((d.RBI_POLICY||{}).rate+'%'):'--',         getClass:d=>'c-neutral' },
-    FED_BALANCE: { label:'FED BAL SHT', cat:'Global Rates',    getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
+    FED_RATE:    { label:'FED RATE',    cat:'Global Rates',    getValue:d=>'5.50%',                                                            getClass:d=>'c-neutral', getChange:d=>null },
+    US10Y:       { label:'US 10Y',      cat:'Global Rates',    getValue:d=>formatVal(_rv('US10Y',(d.US10Y||{}).val))+'%',                       getClass:d=>(d.US10Y||{}).val>4.5?'c-bear':((d.US10Y||{}).val<3.5?'c-bull':'c-neutral'), liveKey:'US10Y', getChange:d=>_fmtChg(d.US10Y) },
+    US2Y:        { label:'US 2Y',       cat:'Global Rates',    getValue:d=>'4.85%',                                                            getClass:d=>'c-neutral', getChange:d=>null },
+    INDIA10Y:    { label:'INDIA 10Y',   cat:'India Macro',     getValue:d=>'7.02%',                                                            getClass:d=>'c-cyan', getChange:d=>null },
+    RBI_RATE:    { label:'RBI RATE',    cat:'India Macro',     getValue:d=>(d.RBI_POLICY||{}).rate?((d.RBI_POLICY||{}).rate+'%'):'--',         getClass:d=>'c-neutral', getChange:d=>null },
+    FED_BALANCE: { label:'FED BAL SHT', cat:'Global Rates',    getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
     // --- Global Indices ---
-    NASDAQ_R:    { label:'NASDAQ',      cat:'Global Indices',  getValue:d=>formatVal(_rv('NASDAQ',(d.NASDAQ||{}).val)),                         getClass:d=>(d.NASDAQ||{}).chg_pct>0.005?'c-bull':((d.NASDAQ||{}).chg_pct<-0.005?'c-bear':'c-neutral'), liveKey:'NASDAQ' },
-    SP500:       { label:'S&P 500',     cat:'Global Indices',  getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    DOW:         { label:'DOW JONES',   cat:'Global Indices',  getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    NIKKEI:      { label:'NIKKEI',      cat:'Global Indices',  getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    HANGSENG:    { label:'HANG SENG',   cat:'Global Indices',  getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    DAX:         { label:'DAX',         cat:'Global Indices',  getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    FTSE:        { label:'FTSE 100',    cat:'Global Indices',  getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    SGX_NIFTY:   { label:'SGX NIFTY',  cat:'Global Indices',  getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
+    NASDAQ_R:    { label:'NASDAQ',      cat:'Global Indices',  getValue:d=>formatVal(_rv('NASDAQ',(d.NASDAQ||{}).val)),                         getClass:d=>(d.NASDAQ||{}).chg_pct>0.005?'c-bull':((d.NASDAQ||{}).chg_pct<-0.005?'c-bear':'c-neutral'), liveKey:'NASDAQ', getChange:d=>_fmtChg(d.NASDAQ) },
+    SP500:       { label:'S&P 500',     cat:'Global Indices',  getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    DOW:         { label:'DOW JONES',   cat:'Global Indices',  getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    NIKKEI:      { label:'NIKKEI',      cat:'Global Indices',  getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    HANGSENG:    { label:'HANG SENG',   cat:'Global Indices',  getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    DAX:         { label:'DAX',         cat:'Global Indices',  getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    FTSE:        { label:'FTSE 100',    cat:'Global Indices',  getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    SGX_NIFTY:   { label:'SGX NIFTY',  cat:'Global Indices',  getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
     // --- India Indices ---
-    NIFTY_R:     { label:'NIFTY',       cat:'India Indices',   getValue:d=>formatVal(_rv('NIFTY',(d.NIFTY||{}).val)),                          getClass:d=>(d.NIFTY||{}).chg_pct>=0?'c-bull':'c-bear', liveKey:'NIFTY' },
-    SENSEX_R:    { label:'SENSEX',      cat:'India Indices',   getValue:d=>formatVal(_rv('SENSEX',(d.SENSEX||{}).val)),                        getClass:d=>(d.SENSEX||{}).chg_pct>=0?'c-bull':'c-bear', liveKey:'SENSEX' },
-    BANKNIFTY_R: { label:'BANK NIFTY', cat:'India Indices',   getValue:d=>formatVal(_rv('BANKNIFTY',(d.BANKNIFTY||{}).val)),                  getClass:d=>(d.BANKNIFTY||{}).chg_pct>=0?'c-bull':'c-bear', liveKey:'BANKNIFTY' },
-    NIFTY_MID:   { label:'NIFTY MID',  cat:'India Indices',   getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
+    NIFTY_R:     { label:'NIFTY',       cat:'India Indices',   getValue:d=>formatVal(_rv('NIFTY',(d.NIFTY||{}).val)),                          getClass:d=>(d.NIFTY||{}).chg_pct>=0?'c-bull':'c-bear', liveKey:'NIFTY', getChange:d=>_fmtChg(d.NIFTY) },
+    SENSEX_R:    { label:'SENSEX',      cat:'India Indices',   getValue:d=>formatVal(_rv('SENSEX',(d.SENSEX||{}).val)),                        getClass:d=>(d.SENSEX||{}).chg_pct>=0?'c-bull':'c-bear', liveKey:'SENSEX', getChange:d=>_fmtChg(d.SENSEX) },
+    BANKNIFTY_R: { label:'BANK NIFTY', cat:'India Indices',   getValue:d=>formatVal(_rv('BANKNIFTY',(d.BANKNIFTY||{}).val)),                  getClass:d=>(d.BANKNIFTY||{}).chg_pct>=0?'c-bull':'c-bear', liveKey:'BANKNIFTY', getChange:d=>_fmtChg(d.BANKNIFTY) },
+    NIFTY_MID:   { label:'NIFTY MID',  cat:'India Indices',   getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
     // --- Volatility ---
-    VIX_US_R:    { label:'VIX (US)',    cat:'Volatility',      getValue:d=>formatVal(_rv('VIX_US',(d.VIX_US||{}).val)),                        getClass:d=>(d.VIX_US||{}).val>25?'c-bear':((d.VIX_US||{}).val<18?'c-bull':'c-neutral'), liveKey:'VIX_US' },
-    INDIA_VIX_R: { label:'INDIA VIX',  cat:'Volatility',      getValue:d=>'12.4',                                                             getClass:d=>'c-bull' },
+    VIX_US_R:    { label:'VIX (US)',    cat:'Volatility',      getValue:d=>formatVal(_rv('VIX_US',(d.VIX_US||{}).val)),                        getClass:d=>(d.VIX_US||{}).val>25?'c-bear':((d.VIX_US||{}).val<18?'c-bull':'c-neutral'), liveKey:'VIX_US', getChange:d=>_fmtChg(d.VIX_US) },
+    INDIA_VIX_R: { label:'INDIA VIX',  cat:'Volatility',      getValue:d=>'12.4',                                                             getClass:d=>'c-bull', getChange:d=>null },
     // --- Commodities ---
-    BRENT_R:     { label:'BRENT',       cat:'Commodities',     getValue:d=>'$'+formatVal(_rv('BRENT',(d.BRENT||{}).val)),                      getClass:d=>(d.BRENT||{}).chg_pct>0.01?'c-bear':((d.BRENT||{}).chg_pct<-0.01?'c-bull':'c-neutral'), liveKey:'BRENT' },
-    WTI:         { label:'WTI',         cat:'Commodities',     getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    GOLD_R:      { label:'GOLD',        cat:'Commodities',     getValue:d=>'$'+formatVal(_rv('GOLD',(d.GOLD||{}).val)),                        getClass:d=>(d.GOLD||{}).chg_pct>0.005?'c-bull':'c-neutral', liveKey:'GOLD' },
-    SILVER:      { label:'SILVER',      cat:'Commodities',     getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    COPPER:      { label:'COPPER',      cat:'Commodities',     getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    NATGAS:      { label:'NAT GAS',     cat:'Commodities',     getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    ALUMINIUM:   { label:'ALUMINIUM',   cat:'Commodities',     getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    ZINC:        { label:'ZINC',        cat:'Commodities',     getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    LEAD:        { label:'LEAD',        cat:'Commodities',     getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    PALM_OIL:    { label:'PALM OIL',   cat:'Commodities',     getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    OPEC_PROD:   { label:'OPEC PROD',  cat:'Commodities',     getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
+    BRENT_R:     { label:'BRENT',       cat:'Commodities',     getValue:d=>'$'+formatVal(_rv('BRENT',(d.BRENT||{}).val)),                      getClass:d=>(d.BRENT||{}).chg_pct>0.01?'c-bear':((d.BRENT||{}).chg_pct<-0.01?'c-bull':'c-neutral'), liveKey:'BRENT', getChange:d=>_fmtChg(d.BRENT) },
+    WTI:         { label:'WTI',         cat:'Commodities',     getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    GOLD_R:      { label:'GOLD',        cat:'Commodities',     getValue:d=>'$'+formatVal(_rv('GOLD',(d.GOLD||{}).val)),                        getClass:d=>(d.GOLD||{}).chg_pct>0.005?'c-bull':'c-neutral', liveKey:'GOLD', getChange:d=>_fmtChg(d.GOLD) },
+    SILVER:      { label:'SILVER',      cat:'Commodities',     getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    COPPER:      { label:'COPPER',      cat:'Commodities',     getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    NATGAS:      { label:'NAT GAS',     cat:'Commodities',     getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    ALUMINIUM:   { label:'ALUMINIUM',   cat:'Commodities',     getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    ZINC:        { label:'ZINC',        cat:'Commodities',     getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    LEAD:        { label:'LEAD',        cat:'Commodities',     getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    PALM_OIL:    { label:'PALM OIL',   cat:'Commodities',     getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    OPEC_PROD:   { label:'OPEC PROD',  cat:'Commodities',     getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
     // --- Currencies ---
-    DXY_R:       { label:'DXY',         cat:'Currencies',      getValue:d=>formatVal(_rv('DXY',(d.DXY||{}).val)),                              getClass:d=>(d.DXY||{}).chg_pct>0.002?'c-bear':((d.DXY||{}).chg_pct<-0.002?'c-bull':'c-neutral'), liveKey:'DXY' },
-    INRUSD_R:    { label:'INR/USD',     cat:'Currencies',      getValue:d=>'\u20b9'+formatVal(_rv('INRUSD',(d.INRUSD||{}).val)),               getClass:d=>(d.INRUSD||{}).chg_pct>0.0015?'c-bear':((d.INRUSD||{}).chg_pct<-0.0015?'c-bull':'c-neutral'), liveKey:'INRUSD' },
-    EURUSD:      { label:'EUR/USD',     cat:'Currencies',      getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    USDJPY:      { label:'USD/JPY',     cat:'Currencies',      getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    GBPUSD:      { label:'GBP/USD',     cat:'Currencies',      getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
+    DXY_R:       { label:'DXY',         cat:'Currencies',      getValue:d=>formatVal(_rv('DXY',(d.DXY||{}).val)),                              getClass:d=>(d.DXY||{}).chg_pct>0.002?'c-bear':((d.DXY||{}).chg_pct<-0.002?'c-bull':'c-neutral'), liveKey:'DXY', getChange:d=>_fmtChg(d.DXY) },
+    INRUSD_R:    { label:'INR/USD',     cat:'Currencies',      getValue:d=>'\u20b9'+formatVal(_rv('INRUSD',(d.INRUSD||{}).val)),               getClass:d=>(d.INRUSD||{}).chg_pct>0.0015?'c-bear':((d.INRUSD||{}).chg_pct<-0.0015?'c-bull':'c-neutral'), liveKey:'INRUSD', getChange:d=>_fmtChg(d.INRUSD) },
+    EURUSD:      { label:'EUR/USD',     cat:'Currencies',      getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    USDJPY:      { label:'USD/JPY',     cat:'Currencies',      getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    GBPUSD:      { label:'GBP/USD',     cat:'Currencies',      getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
     // --- Crypto ---
-    BTC_R:       { label:'BITCOIN',     cat:'Crypto',          getValue:d=>'$'+Math.round(_rv('BTC',(d.BTC||{}).val||60000)),                  getClass:d=>(d.BTC||{}).chg_pct>0.01?'c-bull':((d.BTC||{}).chg_pct<-0.01?'c-bear':'c-neutral'), liveKey:'BTC' },
-    ETH:         { label:'ETHEREUM',    cat:'Crypto',          getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
+    BTC_R:       { label:'BITCOIN',     cat:'Crypto',          getValue:d=>'$'+Math.round(_rv('BTC',(d.BTC||{}).val||60000)),                  getClass:d=>(d.BTC||{}).chg_pct>0.01?'c-bull':((d.BTC||{}).chg_pct<-0.01?'c-bear':'c-neutral'), liveKey:'BTC', getChange:d=>_fmtChg(d.BTC) },
+    ETH:         { label:'ETHEREUM',    cat:'Crypto',          getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
     // --- India Flows ---
-    FII_FLOW_R:  { label:'FII FLOW',    cat:'India Flows',     getValue:d=>d.FII||'--',                                                        getClass:d=>(d.FII||'').startsWith('B')?'c-bull':'c-bear' },
-    DII_FLOW_R:  { label:'DII FLOW',    cat:'India Flows',     getValue:d=>d.DII||'--',                                                        getClass:d=>(d.DII||'').startsWith('B')?'c-bull':((d.DII||'').startsWith('S')?'c-bear':'c-neutral') },
+    FII_FLOW_R:  { label:'FII FLOW',    cat:'India Flows',     getValue:d=>d.FII||'--',                                                        getClass:d=>(d.FII||'').startsWith('B')?'c-bull':'c-bear', getChange:d=>null },
+    DII_FLOW_R:  { label:'DII FLOW',    cat:'India Flows',     getValue:d=>d.DII||'--',                                                        getClass:d=>(d.DII||'').startsWith('B')?'c-bull':((d.DII||'').startsWith('S')?'c-bear':'c-neutral'), getChange:d=>null },
     // --- Global Macro ---
-    CHINA_PMI:   { label:'CHINA PMI',   cat:'Global Macro',    getValue:d=>'50.4',                                                             getClass:d=>'c-neutral' },
-    US_PMI:      { label:'US PMI',      cat:'Global Macro',    getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    US_CPI:      { label:'US CPI',      cat:'Global Macro',    getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    US_JOBS:     { label:'US JOBS',     cat:'Global Macro',    getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    BALTIC_DRY:  { label:'BALTIC DRY', cat:'Global Macro',    getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
+    CHINA_PMI:   { label:'CHINA PMI',   cat:'Global Macro',    getValue:d=>'50.4',                                                             getClass:d=>'c-neutral', getChange:d=>null },
+    US_PMI:      { label:'US PMI',      cat:'Global Macro',    getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    US_CPI:      { label:'US CPI',      cat:'Global Macro',    getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    US_JOBS:     { label:'US JOBS',     cat:'Global Macro',    getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    BALTIC_DRY:  { label:'BALTIC DRY', cat:'Global Macro',    getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
     // --- India Macro ---
-    INDIA_PMI:   { label:'INDIA PMI',   cat:'India Macro',     getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    INDIA_CPI:   { label:'INDIA CPI',   cat:'India Macro',     getValue:d=>'--',                                                               getClass:d=>'c-neutral' },
-    GST_COLL_R:  { label:'GST COLL',    cat:'India Macro',     getValue:d=>'\u20b91.7L Cr',                                                   getClass:d=>'c-bull' },
-    ADV_TAX_R:   { label:'ADV TAX',     cat:'India Macro',     getValue:d=>'+18% YoY',                                                        getClass:d=>'c-bull' },
-    MONSOON_R:   { label:'MONSOON',     cat:'India Macro',     getValue:d=>'NORMAL',                                                           getClass:d=>'c-bull' },
+    INDIA_PMI:   { label:'INDIA PMI',   cat:'India Macro',     getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    INDIA_CPI:   { label:'INDIA CPI',   cat:'India Macro',     getValue:d=>'--',                                                               getClass:d=>'c-neutral', getChange:d=>null },
+    GST_COLL_R:  { label:'GST COLL',    cat:'India Macro',     getValue:d=>'\u20b91.7L Cr',                                                   getClass:d=>'c-bull', getChange:d=>null },
+    ADV_TAX_R:   { label:'ADV TAX',     cat:'India Macro',     getValue:d=>'+18% YoY',                                                        getClass:d=>'c-bull', getChange:d=>null },
+    MONSOON_R:   { label:'MONSOON',     cat:'India Macro',     getValue:d=>'NORMAL',                                                           getClass:d=>'c-bull', getChange:d=>null },
     // --- India Events ---
-    EARNINGS_R:  { label:'EARNINGS',    cat:'India Events',    getValue:d=>'Q4 FY24',                                                          getClass:d=>'c-neutral' },
-    POLICY_R:    { label:'POLICY',      cat:'India Events',    getValue:d=>(d.RBI_POLICY||{}).next||'--',                                      getClass:d=>'c-neutral' },
-    GEOPOLIT_R:  { label:'GEOPOLIT.',   cat:'Global Events',   getValue:d=>'NEUTRAL',                                                          getClass:d=>'c-accent' },
+    EARNINGS_R:  { label:'EARNINGS',    cat:'India Events',    getValue:d=>'Q4 FY24',                                                          getClass:d=>'c-neutral', getChange:d=>null },
+    POLICY_R:    { label:'POLICY',      cat:'India Events',    getValue:d=>(d.RBI_POLICY||{}).next||'--',                                      getClass:d=>'c-neutral', getChange:d=>null },
+    GEOPOLIT_R:  { label:'GEOPOLIT.',   cat:'Global Events',   getValue:d=>'NEUTRAL',                                                          getClass:d=>'c-accent', getChange:d=>null },
 };
 
 const RADAR_MAX = 21;
@@ -135,8 +135,10 @@ function updateTickerValues() {
 }
 
 let _dragSrcId = null;
+window._rdragged = false;
+let _radarDragInited = false;
 
-function createRadarTile(label, valStr, dataStateClass, isLiveObjKey = false, itemId = null) {
+function createRadarTile(label, valStr, dataStateClass, isLiveObjKey = false, itemId = null, changeInfo = null) {
     const isLive = (isLiveObjKey && simPrices[isLiveObjKey] && simPrices[isLiveObjKey].open);
     const liveCls = isLive ? 'is-live' : '';
     const action = isLiveObjKey ? `onclick="if(!window._rdragged)loadChartForTicker('${isLiveObjKey}')"` : `onclick="if(!window._rdragged)openRadarIntel('${label}', '${valStr}')" style="cursor:pointer;" title="View Macro Intel"`;
@@ -145,14 +147,19 @@ function createRadarTile(label, valStr, dataStateClass, isLiveObjKey = false, it
     const dragAttr = itemId ? ' draggable="true"' : '';
     const delBtn = itemId ? `<button class="rt-del" onclick="event.stopPropagation();removeRadarItem('${itemId}')" title="Remove">&#x2715;</button>` : '';
     const dragHandle = itemId ? `<div class="rt-drag-handle" title="Drag to reorder">&#8942;&#8942;</div>` : '';
+    const chgHtml = changeInfo ? `<div class="rt-c ${changeInfo.up ? 'chg-up' : 'chg-dn'}">${changeInfo.text}</div>` : '';
     return `<div class="rt ${dataStateClass} ${liveCls}" ${action}${keyAttr}${ridAttr}${dragAttr}>
         ${delBtn}${dragHandle}
         <div class="rt-l">${label}</div>
         <div class="rt-v">${valStr}</div>
+        ${chgHtml}
     </div>`;
 }
 
 function _initRadarDrag(grid) {
+    if (_radarDragInited) return;
+    _radarDragInited = true;
+
     grid.addEventListener('dragstart', e => {
         const tile = e.target.closest('.rt[data-rid]');
         if (!tile) return;
@@ -166,7 +173,7 @@ function _initRadarDrag(grid) {
         grid.querySelectorAll('.rt-dragging, .rt-drag-over').forEach(el => {
             el.classList.remove('rt-dragging', 'rt-drag-over');
         });
-        setTimeout(() => { window._rdragged = false; }, 80);
+        window._rdragged = false;
     });
     grid.addEventListener('dragover', e => {
         e.preventDefault();
@@ -196,6 +203,8 @@ function _initRadarDrag(grid) {
         activeRadarIds.splice(dstIdx, 0, _dragSrcId);
         _saveRadarIds();
         renderRadar();
+        // Reset _rdragged after a short delay so the click guard expires
+        setTimeout(() => { window._rdragged = false; }, 150);
     });
 }
 
@@ -215,7 +224,26 @@ function updateRadarValues() {
             case 'US10Y':  valEl.textContent = formatVal(v) + '%';  break;
             default:       valEl.textContent = formatVal(v);
         }
+        // Update change text if present
+        const chgEl = el.querySelector('.rt-c');
+        if (chgEl && marketData[k]) {
+            const info = _fmtChg(marketData[k]);
+            if (info) {
+                chgEl.textContent = info.text;
+                chgEl.className = 'rt-c ' + (info.up ? 'chg-up' : 'chg-dn');
+            }
+        }
     });
+}
+
+// Helper: format change text for radar tiles — returns {text, up} or null
+function _fmtChg(item) {
+    if (!item || item.chg == null || item.chg_pct == null) return null;
+    const pct = (item.chg_pct * 100);
+    const abs = item.chg;
+    if (pct === 0 && abs === 0) return null;
+    const sign = pct >= 0 ? '+' : '';
+    return { text: sign + pct.toFixed(2) + '% (' + sign + formatVal(abs) + ')', up: pct >= 0 };
 }
 
 // Helper: get simPrices display value with fallback to marketData raw
@@ -229,7 +257,8 @@ function renderRadar() {
     const t = activeRadarIds.map(id => {
         const cfg = RADAR_CATALOG[id];
         if (!cfg) return '';
-        return createRadarTile(cfg.label, cfg.getValue(d), cfg.getClass(d), cfg.liveKey || false, id);
+        const chgInfo = cfg.getChange ? cfg.getChange(d) : null;
+        return createRadarTile(cfg.label, cfg.getValue(d), cfg.getClass(d), cfg.liveKey || false, id, chgInfo);
     });
     rg.innerHTML = t.join('');
     _updateRadarCount();
