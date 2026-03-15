@@ -459,4 +459,6 @@ def prewarm():
 
 if __name__ == '__main__':
     threading.Thread(target=prewarm, daemon=True).start()
-    app.run(debug=True, port=5000, use_reloader=False)
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('RAILWAY_ENVIRONMENT') is None
+    app.run(host='0.0.0.0', port=port, debug=debug, use_reloader=False)
