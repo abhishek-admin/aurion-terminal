@@ -280,12 +280,13 @@ def _fetch_sectors():
             volumes = df['Volume'].dropna() if 'Volume' in df else []
             if len(close_prices) > 0:
                 curr = float(close_prices.iloc[-1])
-                # Daily change proxy
-                d_df = yf.Ticker(sym).history(period='5d', interval='1d')
-                if len(d_df) >= 2:
-                    prev = float(d_df['Close'].iloc[-2])
+                # Daily change from 15m data — use first price of today vs current
+                today_str = close_prices.index[-1].strftime('%Y-%m-%d') if hasattr(close_prices.index[-1], 'strftime') else str(close_prices.index[-1])[:10]
+                today_prices = close_prices[close_prices.index.strftime('%Y-%m-%d') == today_str] if hasattr(close_prices.index, 'strftime') else close_prices[-8:]
+                if len(today_prices) >= 2:
+                    prev = float(today_prices.iloc[0])
                 else:
-                    prev = curr
+                    prev = float(close_prices.iloc[-2]) if len(close_prices) >= 2 else curr
                 chg_pct = (curr - prev) / prev if prev else 0
                 
                 sparks = close_prices[-25:].tolist()

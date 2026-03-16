@@ -5,7 +5,11 @@
 
 // --- Tier-aware refresh intervals ---
 const _marketRefreshMs = typeof getRefreshInterval === 'function' ? getRefreshInterval() : 18000;
-pollMarket(); pollNews(); pollSectors(); pollSentiment();
+
+// Fire ALL polls in parallel so no section waits for another
+Promise.all([pollMarket(), pollNews(), pollSectors(), pollSentiment()])
+    .catch(() => {});
+
 setInterval(pollMarket, _marketRefreshMs);
 setInterval(pollNews, 60000);
 setInterval(pollSectors, 30000);

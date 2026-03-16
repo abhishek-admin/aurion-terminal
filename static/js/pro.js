@@ -337,5 +337,42 @@ if (document.readyState === 'loading') {
     setTimeout(showLiveDataPrompt, 5000);
 }
 
+// --- TRIAL BADGE IN TOPBAR ---
+function updateTrialBadge() {
+    const btn = document.getElementById('pro-trial-btn');
+    if (!btn) return;
+    const state = _getProState();
+
+    if (state && state.tier === 'pro') {
+        // Paid pro
+        btn.textContent = 'PRO ✓';
+        btn.className = 'btn';
+        btn.style.background = 'linear-gradient(135deg, var(--accent), #d4942a)';
+        btn.style.color = '#06060c';
+        btn.style.border = 'none';
+        btn.onclick = null;
+    } else if (isTrialActive()) {
+        const days = _getTrialDaysLeft();
+        btn.textContent = '';
+        btn.innerHTML = `⏱ ${days}d LEFT`;
+        btn.className = 'btn trial-badge-btn';
+        btn.title = `Free trial: ${days} day${days !== 1 ? 's' : ''} remaining`;
+        btn.onclick = () => showUpgradeModal('manual');
+    } else {
+        btn.textContent = '';
+        btn.innerHTML = 'TRIAL ENDED';
+        btn.className = 'btn trial-expired-btn';
+        btn.title = 'Your free trial has expired — upgrade to Pro';
+        btn.onclick = () => showUpgradeModal('trial_expired');
+    }
+}
+
+// Update badge on load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateTrialBadge);
+} else {
+    updateTrialBadge();
+}
+
 // --- INIT ---
 _initProState();
