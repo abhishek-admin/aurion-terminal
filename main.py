@@ -316,6 +316,10 @@ def _fetch_sectors():
 def index():
     return render_template('index.html')
 
+@app.route('/pro')
+def pro_page():
+    return render_template('pro.html')
+
 @app.route('/api/market')
 def api_market():
     return jsonify({

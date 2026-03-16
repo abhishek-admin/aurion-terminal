@@ -81,6 +81,22 @@ async function streamAIReport(ticker) {
     const key = localStorage.getItem('aurion_llm_key');
     const aic = document.getElementById('ai-content');
 
+    // --- PRO GATE: AI report daily limit ---
+    if (typeof canUseAI === 'function' && !canUseAI()) {
+        aic.innerHTML = `
+            <div style="text-align:center; padding: 40px;">
+                <div style="font-size:48px; margin-bottom:16px;">⚡</div>
+                <h2 style="color:var(--accent); font-family:'JetBrains Mono'; margin-bottom:12px;">DAILY AI LIMIT REACHED</h2>
+                <p style="color:var(--text-muted); margin-bottom:8px;">You've used <strong style="color:var(--bear)">${getAIUsedToday()}/${PRO_CONFIG.FREE_AI_LIMIT}</strong> free AI reports today.</p>
+                <p style="color:var(--text-muted); margin-bottom:24px;">Pro members get <strong style="color:var(--cyan)">unlimited</strong> AI intelligence reports.</p>
+                <button class="btn-glow" style="margin-top:8px; padding:12px 32px; font-size:13px;" onclick="showUpgradeModal('ai_limit')">Upgrade to Pro →</button>
+                <p style="color:var(--text-muted); font-size:11px; margin-top:16px;">Resets daily at midnight IST</p>
+            </div>
+        `;
+        return;
+    }
+    if (typeof incrementAIUsage === 'function') incrementAIUsage();
+
     if (!key) {
         aic.innerHTML = `
             <div style="text-align:center; padding: 40px; color:var(--bear);">
@@ -199,6 +215,25 @@ async function streamAINewsSummary(title, desc) {
     const key = localStorage.getItem('aurion_llm_key');
     const aic = document.getElementById('news-ai-content');
 
+    // --- PRO GATE: AI news summaries are Pro-only ---
+    if (typeof isPro === 'function' && !isPro()) {
+        aic.innerHTML = `
+            <div style="text-align:center; padding: 40px;">
+                <div style="font-size:48px; margin-bottom:16px;">⚡</div>
+                <h2 style="color:var(--accent); font-family:'JetBrains Mono'; margin-bottom:12px;">PRO FEATURE</h2>
+                <p style="color:var(--text-muted); margin-bottom:24px;">AI News Summaries extract key insights from every headline.<br>Available exclusively on <strong style="color:var(--cyan)">Aurion Pro</strong>.</p>
+                <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:24px; text-align:left; filter:blur(3px); user-select:none;">
+                    <h3 style="color:var(--cyan); font-size:13px; margin-bottom:8px;">EXECUTIVE SUMMARY</h3>
+                    <p style="color:var(--text-muted); font-size:12px;">Market sentiment shifts as FII flows reverse direction, impacting banking sector valuations across the board...</p>
+                    <h3 style="color:var(--cyan); font-size:13px; margin-top:16px; margin-bottom:8px;">MARKET IMPACT</h3>
+                    <p style="color:var(--text-muted); font-size:12px;">Bank NIFTY expected to see 1.2-1.5% correction in near term as institutional selling pressure mounts...</p>
+                </div>
+                <button class="btn-glow" style="padding:12px 32px; font-size:13px;" onclick="showUpgradeModal('ai_news')">Unlock AI Summaries →</button>
+            </div>
+        `;
+        return;
+    }
+
     if (!key) {
         aic.innerHTML = `
             <div style="text-align:center; padding: 40px; color:var(--bear);">
@@ -315,6 +350,20 @@ async function streamAIMacroIntel(label, value, relNews) {
 
     const key = localStorage.getItem('aurion_llm_key');
     const aic = document.getElementById('ai-content');
+
+    // --- PRO GATE: Macro intel counts as AI report ---
+    if (typeof canUseAI === 'function' && !canUseAI()) {
+        aic.innerHTML = `
+            <div style="text-align:center; padding: 40px;">
+                <div style="font-size:48px; margin-bottom:16px;">⚡</div>
+                <h2 style="color:var(--accent); font-family:'JetBrains Mono'; margin-bottom:12px;">DAILY AI LIMIT REACHED</h2>
+                <p style="color:var(--text-muted); margin-bottom:24px;">You've used all ${PRO_CONFIG.FREE_AI_LIMIT} free AI reports today.</p>
+                <button class="btn-glow" style="padding:12px 32px; font-size:13px;" onclick="showUpgradeModal('ai_limit')">Upgrade to Pro →</button>
+            </div>
+        `;
+        return;
+    }
+    if (typeof incrementAIUsage === 'function') incrementAIUsage();
 
     if (!key) {
         aic.innerHTML = `<div style="text-align:center; padding: 40px; color:var(--bear);"><h2>⚠️ AUTHENTICATION REQUIRED</h2><p>No valid LLM API key detected in Local Storage.</p><button class="btn-glow" style="margin-top:20px;" onclick="openSettings()">Configure Settings Now</button></div>`;

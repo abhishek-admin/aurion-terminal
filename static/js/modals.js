@@ -64,7 +64,14 @@ window.closeAddStockModal = function () {
 
 window.saveTrackedStocks = function () {
     const raw = document.getElementById('add-stock-input').value;
-    trackedStocks = raw.split(',').map(s => s.trim().toUpperCase()).filter(s => s.length > 0);
+    let stocks = raw.split(',').map(s => s.trim().toUpperCase()).filter(s => s.length > 0);
+    // --- PRO GATE: Limit tracked stocks for free tier ---
+    const maxTrack = typeof getTrackedLimit === 'function' ? getTrackedLimit() : 999;
+    if (stocks.length > maxTrack) {
+        stocks = stocks.slice(0, maxTrack);
+        if (typeof showUpgradeModal === 'function') showUpgradeModal('tracked_limit');
+    }
+    trackedStocks = stocks;
     localStorage.setItem('aurion_tracked_stocks', JSON.stringify(trackedStocks));
     closeAddStockModal();
     renderTrackedStocks();

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurion Pro — Professional Market Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@600;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #06060c;
+            --surface: rgba(20, 20, 30, 0.6);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #fdfdfd;
+            --muted: #8b8e9e;
+            --accent: #e2ab34;
+            --cyan: #06b6d4;
+            --bull: #10b981;
+            --bear: #f43f5e;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- HERO --- */
+        .hero {
+            position: relative;
+            padding: 80px 24px 60px;
+            text-align: center;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -200px; left: 50%; transform: translateX(-50%);
+            width: 800px; height: 800px;
+            background: radial-gradient(circle, rgba(226,171,52,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero-badge {
+            display: inline-block;
+            font-family: 'JetBrains Mono';
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: var(--accent);
+            background: rgba(226,171,52,0.1);
+            border: 1px solid rgba(226,171,52,0.3);
+            padding: 6px 16px;
+            border-radius: 999px;
+            margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-family: 'Space Grotesk';
+            font-size: clamp(36px, 6vw, 64px);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #fdfdfd 0%, #e2ab34 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 18px;
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+
+        /* --- COMPARISON TABLE --- */
+        .compare {
+            max-width: 900px;
+            margin: 0 auto 80px;
+            padding: 0 24px;
+        }
+        .compare h2 {
+            font-family: 'Space Grotesk';
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .compare-table th {
+            font-family: 'JetBrains Mono';
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: var(--muted);
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .compare-table th:nth-child(2),
+        .compare-table th:nth-child(3) { text-align: center; }
+        .compare-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: var(--muted);
+        }
+        .compare-table td:nth-child(2),
+        .compare-table td:nth-child(3) { text-align: center; font-family: 'JetBrains Mono'; font-size: 13px; }
+        .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+        .check { color: var(--bull); }
+        .cross { color: var(--bear); opacity: 0.5; }
+        .limit { color: var(--accent); }
+        .pro-col { color: var(--cyan); font-weight: 700; }
+
+        /* --- PRICING --- */
+        .pricing {
+            max-width: 700px;
+            margin: 0 auto 80px;
+            padding: 0 24px;
+            text-align: center;
+        }
+        .pricing h2 {
+            font-family: 'Space Grotesk';
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+        .pricing-sub {
+            color: var(--muted);
+            margin-bottom: 40px;
+        }
+        .plans {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .plan {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .plan:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+        .plan-best {
+            border-color: var(--accent);
+            position: relative;
+            background: rgba(226,171,52,0.04);
+        }
+        .plan-best::before {
+            content: 'BEST VALUE';
+            position: absolute;
+            top: -10px; left: 50%; transform: translateX(-50%);
+            font-family: 'JetBrains Mono';
+            font-size: 9px;
+            letter-spacing: 2px;
+            color: var(--bg);
+            background: var(--accent);
+            padding: 3px 12px;
+            border-radius: 999px;
+            font-weight: 700;
+        }
+        .plan-name {
+            font-family: 'JetBrains Mono';
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: var(--muted);
+            margin-bottom: 16px;
+        }
+        .plan-price {
+            font-family: 'Space Grotesk';
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .plan-price span { font-size: 18px; color: var(--muted); font-weight: 400; }
+        .plan-period { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+        .plan-cta {
+            display: block;
+            width: 100%;
+            padding: 14px 0;
+            font-family: 'JetBrains Mono';
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .plan-cta-free {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+        }
+        .plan-cta-pro {
+            background: linear-gradient(135deg, var(--accent), #d4942a);
+            color: var(--bg);
+        }
+        .plan-cta-pro:hover { transform: scale(1.02); box-shadow: 0 4px 20px rgba(226,171,52,0.3); }
+
+        /* --- FEATURES GRID --- */
+        .features {
+            max-width: 900px;
+            margin: 0 auto 80px;
+            padding: 0 24px;
+        }
+        .features h2 {
+            font-family: 'Space Grotesk';
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .feat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+        .feat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+        .feat-card:hover { border-color: rgba(255,255,255,0.15); }
+        .feat-icon {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+        .feat-card h3 {
+            font-family: 'JetBrains Mono';
+            font-size: 13px;
+            letter-spacing: 1px;
+            color: var(--cyan);
+            margin-bottom: 8px;
+        }
+        .feat-card p {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* --- FAQ --- */
+        .faq {
+            max-width: 700px;
+            margin: 0 auto 80px;
+            padding: 0 24px;
+        }
+        .faq h2 {
+            font-family: 'Space Grotesk';
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .faq-item {
+            border-bottom: 1px solid var(--border);
+            padding: 20px 0;
+        }
+        .faq-q {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+        .faq-a {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* --- FOOTER CTA --- */
+        .final-cta {
+            text-align: center;
+            padding: 60px 24px 80px;
+            background: linear-gradient(180deg, transparent, rgba(226,171,52,0.03));
+        }
+        .final-cta h2 {
+            font-family: 'Space Grotesk';
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+        .final-cta p {
+            color: var(--muted);
+            margin-bottom: 32px;
+        }
+        .final-cta-btn {
+            display: inline-block;
+            padding: 16px 48px;
+            font-family: 'JetBrains Mono';
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, var(--accent), #d4942a);
+            color: var(--bg);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .final-cta-btn:hover { transform: scale(1.03); box-shadow: 0 8px 30px rgba(226,171,52,0.3); }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 24px;
+            font-family: 'JetBrains Mono';
+            font-size: 12px;
+            color: var(--muted);
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+        .back-link:hover { color: var(--cyan); }
+
+        /* --- DISCLAIMER --- */
+        .disclaimer {
+            text-align: center;
+            padding: 24px;
+            font-size: 11px;
+            color: var(--muted);
+            opacity: 0.6;
+            border-top: 1px solid var(--border);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 600px) {
+            .plans { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HERO -->
+    <section class="hero">
+        <a href="/" class="back-link">&larr; BACK TO TERMINAL</a>
+        <div class="hero-badge">AURION PRO</div>
+        <h1>Professional-Grade<br>Market Intelligence</h1>
+        <p>Everything in the free terminal, plus unlimited AI reports, all 8 sectors, 5,000+ stock search, real-time 18-second refresh, and features built for serious traders.</p>
+    </section>
+
+    <!-- COMPARISON TABLE -->
+    <section class="compare">
+        <h2>Free vs Pro</h2>
+        <table class="compare-table">
+            <thead>
+                <tr>
+                    <th>FEATURE</th>
+                    <th>FREE</th>
+                    <th class="pro-col">PRO</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Dashboard + 21-Factor RADAR</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                </tr>
+                <tr>
+                    <td>11 Global Tickers</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                </tr>
+                <tr>
+                    <td>Market Stress Index</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                </tr>
+                <tr>
+                    <td>Data Refresh Rate</td>
+                    <td class="limit">60s</td>
+                    <td class="pro-col">18s</td>
+                </tr>
+                <tr>
+                    <td>Live Bloomberg-Style Animations</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="check">&#10003;</td>
+                </tr>
+                <tr>
+                    <td>News Articles</td>
+                    <td class="limit">15</td>
+                    <td class="pro-col">80+</td>
+                </tr>
+                <tr>
+                    <td>AI Stock Reports</td>
+                    <td class="limit">3 / day</td>
+                    <td class="pro-col">Unlimited</td>
+                </tr>
+                <tr>
+                    <td>AI News Summaries</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="check">&#10003;</td>
+                </tr>
+                <tr>
+                    <td>AI Macro Intelligence</td>
+                    <td class="limit">3 / day</td>
+                    <td class="pro-col">Unlimited</td>
+                </tr>
+                <tr>
+                    <td>Sector Trackers</td>
+                    <td class="limit">4 of 8</td>
+                    <td class="pro-col">All 8</td>
+                </tr>
+                <tr>
+                    <td>Stock Search Database</td>
+                    <td class="limit">NIFTY 50</td>
+                    <td class="pro-col">5,000+</td>
+                </tr>
+                <tr>
+                    <td>Tracked Stocks Watchlist</td>
+                    <td class="limit">5 max</td>
+                    <td class="pro-col">Unlimited</td>
+                </tr>
+                <tr>
+                    <td>TradingView Charts</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                </tr>
+                <tr>
+                    <td>Stress Index Spike Alerts</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="check">Coming Soon</td>
+                </tr>
+                <tr>
+                    <td>Daily AI Market Brief (Email)</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="check">Coming Soon</td>
+                </tr>
+                <tr>
+                    <td>Telegram Alerts Bot</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="check">Coming Soon</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features">
+        <h2>What Pro Unlocks</h2>
+        <div class="feat-grid">
+            <div class="feat-card">
+                <div class="feat-icon">&#9889;</div>
+                <h3>UNLIMITED AI REPORTS</h3>
+                <p>Click any ticker and get an instant AI-powered deep dive — technicals, fundamentals, governance alerts, and contextual news. No daily cap.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon">&#128200;</div>
+                <h3>ALL 8 SECTORS</h3>
+                <p>Full drill-down into IT, Bank, Pharma, Auto, FMCG, Metal, Realty, and Energy. See every constituent stock with live prices and weights.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon">&#128161;</div>
+                <h3>AI NEWS EXTRACTION</h3>
+                <p>Every headline gets an AI-generated executive summary and market impact analysis. Know what matters without reading 40 articles.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon">&#9201;</div>
+                <h3>18-SECOND REFRESH</h3>
+                <p>3x faster data updates. During volatile sessions, the difference between 18s and 60s refresh can mean catching a move or missing it.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon">&#128269;</div>
+                <h3>5,000+ STOCK SEARCH</h3>
+                <p>Search across the entire NSE/BSE universe — large, mid, and small caps. Free tier limits you to NIFTY 50. Pro opens everything.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon">&#127916;</div>
+                <h3>LIVE BLINK ANIMATIONS</h3>
+                <p>Bloomberg-style amber glow cycling on all live tickers. Subtle, continuous visual feedback that makes the terminal feel alive.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICING -->
+    <section class="pricing">
+        <h2>Simple, Transparent Pricing</h2>
+        <p class="pricing-sub">Cancel anytime. No lock-in. Pay via UPI, Cards, or Net Banking.</p>
+        <div class="plans">
+            <div class="plan">
+                <div class="plan-name">MONTHLY</div>
+                <div class="plan-price">&#8377;299<span>/mo</span></div>
+                <div class="plan-period">Billed monthly</div>
+                <button class="plan-cta plan-cta-pro" onclick="alert('Payment integration coming soon. Join the founding testers list for early access!')">GET PRO MONTHLY</button>
+            </div>
+            <div class="plan plan-best">
+                <div class="plan-name">ANNUAL</div>
+                <div class="plan-price">&#8377;2,499<span>/yr</span></div>
+                <div class="plan-period">&#8377;208/mo &bull; Save 30%</div>
+                <button class="plan-cta plan-cta-pro" onclick="alert('Payment integration coming soon. Join the founding testers list for early access!')">GET PRO ANNUAL</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-item">
+            <div class="faq-q">What payment methods do you accept?</div>
+            <div class="faq-a">We accept UPI (Google Pay, PhonePe, Paytm), all major credit/debit cards, and net banking via Razorpay. All payments are processed securely in INR.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">Can I cancel anytime?</div>
+            <div class="faq-a">Yes. Cancel anytime from your account settings. You'll retain Pro access until the end of your billing period. No questions asked.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">Do I need an API key for AI reports?</div>
+            <div class="faq-a">Currently, you bring your own API key (free from Google AI Studio). In the upcoming update, Pro users will get AI reports powered by our servers — no key needed.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">Is this investment advice?</div>
+            <div class="faq-a">No. Aurion Terminal is an information and analytics tool. All data, AI reports, and sentiment indicators are for educational and research purposes only. Always consult a qualified financial advisor.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">How is this different from MoneyControl or TradingView?</div>
+            <div class="faq-a">Aurion combines 21 global and domestic factors, 15 news sources, AI-powered analysis, and a real-time stress index into a single Bloomberg-style screen. No other free tool shows you everything that moves NIFTY in one view.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">What's the "Founding Tester" program?</div>
+            <div class="faq-a">Our first 100 testers get lifetime free access to Pro features when we launch paid, their name on the credits wall, and direct access to the developer for feature requests.</div>
+        </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="final-cta">
+        <h2>Start Trading Smarter</h2>
+        <p>One screen. Every factor. Real-time AI intelligence.</p>
+        <a href="/" class="final-cta-btn">OPEN AURION TERMINAL &rarr;</a>
+    </section>
+
+    <!-- DISCLAIMER -->
+    <div class="disclaimer">
+        Aurion Terminal is for educational and research purposes only. Not investment advice. Data provided by Yahoo Finance (15-min delay). AI reports generated by third-party LLMs and may contain inaccuracies. Always do your own research.
+    </div>
+
+</body>
+</html>
