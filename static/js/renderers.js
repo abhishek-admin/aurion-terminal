@@ -324,33 +324,54 @@ function renderNews() {
     const isFree = typeof isPro === 'function' && !isPro();
     let html = '';
 
-    newsDataCache.forEach((n, i) => {
+    // Render clear articles (top 3 for free users)
+    const clearArticles = isFree ? newsDataCache.slice(0, limit) : newsDataCache;
+    clearArticles.forEach((n, i) => {
         let badgeClass = n.sentiment.toLowerCase();
         if (badgeClass === 'bullish') badgeClass = 'bull';
         if (badgeClass === 'bearish') badgeClass = 'bear';
-
-        const isBlurred = isFree && i >= limit;
-
         html += `
-            <div class="n-item ${isBlurred ? 'news-blurred' : ''}" ${isBlurred ? `onclick="window.open('/pro','_blank')"` : `onclick="openNewsPage(${i})"`}>
+            <div class="n-item" onclick="openNewsPage(${i})">
                 <div class="n-meta">
                     <span class="n-src">${n.source}</span>
                     <span class="badge b-${badgeClass}">${n.sentiment}</span>
                 </div>
                 <div class="n-title">${n.title}</div>
                 <div class="n-time">${formatExactTime(n.ts)}</div>
-                ${isBlurred ? '<div class="news-blur-overlay">Unlock in PRO →</div>' : ''}
             </div>
         `;
     });
 
-    // Show unlock CTA after blurred articles
+    // For free users: show blurred preview + overlay
     if (isFree && newsDataCache.length > limit) {
+        const blurredArticles = newsDataCache.slice(limit, limit + 5);
+        let blurredHtml = '';
+        blurredArticles.forEach(n => {
+            let badgeClass = n.sentiment.toLowerCase();
+            if (badgeClass === 'bullish') badgeClass = 'bull';
+            if (badgeClass === 'bearish') badgeClass = 'bear';
+            blurredHtml += `
+                <div class="n-item">
+                    <div class="n-meta">
+                        <span class="n-src">${n.source}</span>
+                        <span class="badge b-${badgeClass}">${n.sentiment}</span>
+                    </div>
+                    <div class="n-title">${n.title}</div>
+                    <div class="n-time">${formatExactTime(n.ts)}</div>
+                </div>
+            `;
+        });
+
         html += `
-            <div class="news-unlock-cta" onclick="window.open('/pro','_blank')">
-                <div class="news-unlock-icon">⚡</div>
-                <div class="news-unlock-text">${newsDataCache.length - limit}+ more articles available</div>
-                <div class="news-unlock-sub">Upgrade to Pro for full access →</div>
+            <div class="news-blur-wrap" onclick="window.open('/pro','_blank')">
+                <div class="news-blur-content">${blurredHtml}</div>
+                <div class="news-blur-overlay">
+                    <div class="news-blur-overlay-inner">
+                        <div style="font-size:22px; margin-bottom:8px;">🔒</div>
+                        <div style="font-family:'JetBrains Mono'; font-size:12px; font-weight:700; color:var(--accent); letter-spacing:1px;">UNLOCK ${newsDataCache.length - limit}+ ARTICLES</div>
+                        <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">Upgrade to Aurion Pro →</div>
+                    </div>
+                </div>
             </div>
         `;
     }

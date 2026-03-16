@@ -278,7 +278,11 @@ function showLiveDataPrompt() {
 }
 
 // Show the prompt 5 seconds after every page load
-setTimeout(showLiveDataPrompt, 5000);
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(showLiveDataPrompt, 5000));
+} else {
+    setTimeout(showLiveDataPrompt, 5000);
+}
 
 // --- INIT ---
 _initProState();
