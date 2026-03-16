@@ -196,5 +196,88 @@ function proBadgeHTML(small) {
     return `<span class="pro-badge" style="${s}">PRO</span>`;
 }
 
+// --- LIVE DATA PRO PROMPT ---
+// Shows a small non-intrusive banner once per session for free users
+function showLiveDataPrompt() {
+    if (isPro()) return;
+    if (sessionStorage.getItem('_live_prompt_shown')) return;
+    sessionStorage.setItem('_live_prompt_shown', '1');
+
+    const banner = document.createElement('div');
+    banner.id = 'pro-live-banner';
+    banner.innerHTML = `
+        <div style="
+            position: fixed;
+            bottom: 48px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9000;
+            background: linear-gradient(135deg, rgba(226,171,52,0.12), rgba(6,182,212,0.08));
+            border: 1px solid rgba(226,171,52,0.25);
+            border-radius: 12px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            max-width: 520px;
+            animation: slideUp 0.4s ease-out;
+        ">
+            <div style="font-size: 24px; flex-shrink: 0;">📡</div>
+            <div style="flex: 1;">
+                <div style="font-family:'JetBrains Mono'; font-size:11px; font-weight:700; color:var(--accent); letter-spacing:1px; margin-bottom:3px;">LIVE DATA AVAILABLE</div>
+                <div style="font-size:12px; color:var(--text-muted); line-height:1.4;">You're on 60s delayed refresh. Pro subscribers get <strong style="color:var(--cyan)">18-second real-time data</strong> with live Bloomberg-style animations.</div>
+            </div>
+            <button onclick="showUpgradeModal('manual');this.parentElement.remove();" style="
+                flex-shrink: 0;
+                font-family:'JetBrains Mono';
+                font-size: 10px;
+                font-weight: 700;
+                letter-spacing: 1px;
+                background: linear-gradient(135deg, var(--accent), #d4942a);
+                color: #06060c;
+                border: none;
+                padding: 8px 14px;
+                border-radius: 6px;
+                cursor: pointer;
+                white-space: nowrap;
+            ">GO PRO</button>
+            <button onclick="this.parentElement.remove();" style="
+                position: absolute;
+                top: 4px; right: 8px;
+                background: none; border: none;
+                color: var(--text-muted);
+                font-size: 14px;
+                cursor: pointer;
+                padding: 2px;
+            ">&times;</button>
+        </div>
+    `;
+
+    // Inject slide-up animation if not already present
+    if (!document.getElementById('pro-banner-anim')) {
+        const style = document.createElement('style');
+        style.id = 'pro-banner-anim';
+        style.textContent = `@keyframes slideUp { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }`;
+        document.head.appendChild(style);
+    }
+
+    document.body.appendChild(banner);
+
+    // Auto-dismiss after 15 seconds
+    setTimeout(() => {
+        const el = document.getElementById('pro-live-banner');
+        if (el) {
+            el.style.transition = 'opacity 0.3s';
+            el.style.opacity = '0';
+            setTimeout(() => el.remove(), 300);
+        }
+    }, 15000);
+}
+
+// Show the prompt 8 seconds after page load (let user settle in first)
+setTimeout(showLiveDataPrompt, 8000);
+
 // --- INIT ---
 _initProState();
