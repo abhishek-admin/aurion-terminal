@@ -349,16 +349,15 @@ function showLiveDataPrompt() {
             left: 50%;
             transform: translateX(-50%);
             z-index: 9000;
-            background: linear-gradient(135deg, rgba(226,171,52,0.15), rgba(6,182,212,0.10));
-            border: 1px solid rgba(226,171,52,0.3);
-            border-radius: 12px;
-            padding: 14px 22px;
+            background: rgba(10,10,18,0.95);
+            border: 1px solid rgba(226,171,52,0.25);
+            border-radius: 3px;
+            padding: 12px 18px;
             display: flex;
             align-items: center;
             gap: 14px;
-            backdrop-filter: blur(16px);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-            max-width: 580px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+            max-width: 560px;
             animation: slideUp 0.4s ease-out;
         ">
             <div style="font-size: 24px; flex-shrink: 0;">${icon}</div>
@@ -372,11 +371,11 @@ function showLiveDataPrompt() {
                 font-size: 10px;
                 font-weight: 700;
                 letter-spacing: 1px;
-                background: linear-gradient(135deg, var(--accent), #d4942a);
+                background: var(--accent);
                 color: #06060c;
                 border: none;
-                padding: 10px 16px;
-                border-radius: 6px;
+                padding: 8px 14px;
+                border-radius: 2px;
                 cursor: pointer;
                 white-space: nowrap;
             ">${btnText}</button>
@@ -421,31 +420,31 @@ if (document.readyState === 'loading') {
     setTimeout(showLiveDataPrompt, 5000);
 }
 
-// --- TRIAL BADGE IN TOPBAR ---
+// --- TRIAL TAG NEXT TO LOGO ---
 function updateTrialBadge() {
-    const btn = document.getElementById('pro-trial-btn');
-    if (!btn) return;
+    const tag = document.getElementById('logo-trial-tag');
+    if (!tag) return;
     const state = _getProState();
 
-    // Clear any leftover inline styles from previous state
-    btn.removeAttribute('style');
+    tag.className = 'logo-trial-tag';
+    tag.onclick = null;
+    tag.style.cursor = 'default';
 
     if (state && state.tier === 'pro') {
-        // Paid pro
-        btn.textContent = 'PRO ✓';
-        btn.className = 'btn pro-badge-btn';
-        btn.onclick = null;
+        tag.textContent = 'PRO';
+        tag.classList.add('pro-active');
     } else if (isTrialActive()) {
         const days = _getTrialDaysLeft();
-        btn.className = 'btn trial-badge-btn';
-        btn.innerHTML = `<span class="trial-dot"></span>TRIAL ${days}D`;
-        btn.title = `Free trial: ${days} day${days !== 1 ? 's' : ''} remaining`;
-        btn.onclick = () => showUpgradeModal('manual');
+        tag.textContent = `TRIAL ${days}D`;
+        tag.title = `Free trial: ${days} day${days !== 1 ? 's' : ''} remaining`;
+        tag.style.cursor = 'pointer';
+        tag.onclick = () => showUpgradeModal('manual');
     } else {
-        btn.className = 'btn trial-expired-btn';
-        btn.innerHTML = 'EXPIRED';
-        btn.title = 'Your free trial has expired — upgrade to Pro';
-        btn.onclick = () => showUpgradeModal('trial_expired');
+        tag.textContent = 'FREE';
+        tag.classList.add('expired');
+        tag.title = 'Trial expired — upgrade to Pro';
+        tag.style.cursor = 'pointer';
+        tag.onclick = () => showUpgradeModal('trial_expired');
     }
 }
 
