@@ -321,33 +321,40 @@ function renderTrackedStocks() {
 function renderNews() {
     renderTrackedStocks();
     const limit = typeof getNewsLimit === 'function' ? getNewsLimit() : 999;
-    const limited = newsDataCache.slice(0, limit);
-    let html = limited.map((n, i) => {
+    const isFree = typeof isPro === 'function' && !isPro();
+    let html = '';
+
+    newsDataCache.forEach((n, i) => {
         let badgeClass = n.sentiment.toLowerCase();
         if (badgeClass === 'bullish') badgeClass = 'bull';
         if (badgeClass === 'bearish') badgeClass = 'bear';
 
-        return `
-            <div class="n-item" onclick="openNewsPage(${i})">
+        const isBlurred = isFree && i >= limit;
+
+        html += `
+            <div class="n-item ${isBlurred ? 'news-blurred' : ''}" ${isBlurred ? `onclick="window.open('/pro','_blank')"` : `onclick="openNewsPage(${i})"`}>
                 <div class="n-meta">
                     <span class="n-src">${n.source}</span>
                     <span class="badge b-${badgeClass}">${n.sentiment}</span>
                 </div>
                 <div class="n-title">${n.title}</div>
                 <div class="n-time">${formatExactTime(n.ts)}</div>
+                ${isBlurred ? '<div class="news-blur-overlay">Unlock in PRO →</div>' : ''}
             </div>
         `;
-    }).join('');
+    });
 
-    // Show "unlock more" teaser for free users
-    if (newsDataCache.length > limit) {
+    // Show unlock CTA after blurred articles
+    if (isFree && newsDataCache.length > limit) {
         html += `
-            <div class="n-item" onclick="showUpgradeModal('news_limit')" style="text-align:center; padding:16px; cursor:pointer; border:1px dashed var(--border); margin:8px; border-radius:8px;">
-                <div style="color:var(--accent); font-family:'JetBrains Mono'; font-size:12px; font-weight:700;">⚡ ${newsDataCache.length - limit} MORE ARTICLES</div>
-                <div style="color:var(--text-muted); font-size:11px; margin-top:4px;">Upgrade to Pro to see all headlines →</div>
+            <div class="news-unlock-cta" onclick="window.open('/pro','_blank')">
+                <div class="news-unlock-icon">⚡</div>
+                <div class="news-unlock-text">${newsDataCache.length - limit}+ more articles available</div>
+                <div class="news-unlock-sub">Upgrade to Pro for full access →</div>
             </div>
         `;
     }
+
     document.getElementById('news-pane').innerHTML = html;
 }
 

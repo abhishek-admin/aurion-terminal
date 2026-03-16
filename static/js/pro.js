@@ -7,7 +7,7 @@
 // --- CONSTANTS ---
 const PRO_CONFIG = {
     FREE_AI_LIMIT: 3,
-    FREE_NEWS_LIMIT: 15,
+    FREE_NEWS_LIMIT: 3,
     FREE_TRACKED_LIMIT: 5,
     FREE_REFRESH_MS: 60000,
     PRO_REFRESH_MS: 18000,
@@ -197,11 +197,12 @@ function proBadgeHTML(small) {
 }
 
 // --- LIVE DATA PRO PROMPT ---
-// Shows a small non-intrusive banner once per session for free users
+// Shows on every page load for free users
 function showLiveDataPrompt() {
     if (isPro()) return;
-    if (sessionStorage.getItem('_live_prompt_shown')) return;
-    sessionStorage.setItem('_live_prompt_shown', '1');
+    // Remove any existing banner first
+    const existing = document.getElementById('pro-live-banner');
+    if (existing) existing.remove();
 
     const banner = document.createElement('div');
     banner.id = 'pro-live-banner';
@@ -212,24 +213,24 @@ function showLiveDataPrompt() {
             left: 50%;
             transform: translateX(-50%);
             z-index: 9000;
-            background: linear-gradient(135deg, rgba(226,171,52,0.12), rgba(6,182,212,0.08));
-            border: 1px solid rgba(226,171,52,0.25);
+            background: linear-gradient(135deg, rgba(226,171,52,0.15), rgba(6,182,212,0.10));
+            border: 1px solid rgba(226,171,52,0.3);
             border-radius: 12px;
-            padding: 12px 20px;
+            padding: 14px 22px;
             display: flex;
             align-items: center;
             gap: 14px;
             backdrop-filter: blur(16px);
             box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-            max-width: 520px;
+            max-width: 580px;
             animation: slideUp 0.4s ease-out;
         ">
             <div style="font-size: 24px; flex-shrink: 0;">📡</div>
             <div style="flex: 1;">
-                <div style="font-family:'JetBrains Mono'; font-size:11px; font-weight:700; color:var(--accent); letter-spacing:1px; margin-bottom:3px;">LIVE DATA AVAILABLE</div>
-                <div style="font-size:12px; color:var(--text-muted); line-height:1.4;">You're on 60s delayed refresh. Pro subscribers get <strong style="color:var(--cyan)">18-second real-time data</strong> with live Bloomberg-style animations.</div>
+                <div style="font-family:'JetBrains Mono'; font-size:11px; font-weight:700; color:var(--accent); letter-spacing:1px; margin-bottom:4px;">UPGRADE TO LIVE DATA</div>
+                <div style="font-size:12px; color:var(--text-muted); line-height:1.5;">You're on <strong style="color:var(--bear)">60s delayed</strong> refresh. Pro members get <strong style="color:var(--cyan)">3-second live updates</strong> for market data, news, sectors &amp; sentiment — with Bloomberg-style animations.</div>
             </div>
-            <button onclick="showUpgradeModal('manual');this.parentElement.remove();" style="
+            <button onclick="window.open('/pro','_blank');this.closest('#pro-live-banner').remove();" style="
                 flex-shrink: 0;
                 font-family:'JetBrains Mono';
                 font-size: 10px;
@@ -238,12 +239,12 @@ function showLiveDataPrompt() {
                 background: linear-gradient(135deg, var(--accent), #d4942a);
                 color: #06060c;
                 border: none;
-                padding: 8px 14px;
+                padding: 10px 16px;
                 border-radius: 6px;
                 cursor: pointer;
                 white-space: nowrap;
             ">GO PRO</button>
-            <button onclick="this.parentElement.remove();" style="
+            <button onclick="this.closest('#pro-live-banner').remove();" style="
                 position: absolute;
                 top: 4px; right: 8px;
                 background: none; border: none;
@@ -265,7 +266,7 @@ function showLiveDataPrompt() {
 
     document.body.appendChild(banner);
 
-    // Auto-dismiss after 15 seconds
+    // Auto-dismiss after 20 seconds
     setTimeout(() => {
         const el = document.getElementById('pro-live-banner');
         if (el) {
@@ -273,11 +274,11 @@ function showLiveDataPrompt() {
             el.style.opacity = '0';
             setTimeout(() => el.remove(), 300);
         }
-    }, 15000);
+    }, 20000);
 }
 
-// Show the prompt 8 seconds after page load (let user settle in first)
-setTimeout(showLiveDataPrompt, 8000);
+// Show the prompt 5 seconds after every page load
+setTimeout(showLiveDataPrompt, 5000);
 
 // --- INIT ---
 _initProState();
