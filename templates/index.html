@@ -1507,59 +1507,36 @@
         .sec-locked:hover { opacity: 0.85; }
 
         /* --- News blur for free tier --- */
-        .n-item.news-blurred {
+        .news-blur-wrap {
             position: relative;
-            filter: blur(5px);
-            user-select: none;
-            pointer-events: none;
-            transition: filter 0.3s;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: var(--radius-sm);
+            margin-top: 4px;
         }
-        .n-item.news-blurred .news-blur-overlay {
+        .news-blur-content {
+            filter: blur(6px);
+            pointer-events: none;
+            user-select: none;
+        }
+        .news-blur-overlay {
             position: absolute;
             inset: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'JetBrains Mono';
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: var(--accent);
-            background: rgba(6, 6, 12, 0.5);
-            filter: blur(0);
-            pointer-events: all;
-            cursor: pointer;
+            background: linear-gradient(180deg, rgba(6,6,12,0.3) 0%, rgba(6,6,12,0.85) 60%, rgba(6,6,12,0.95) 100%);
             z-index: 2;
         }
-        .n-item.news-blurred:hover {
-            filter: blur(3px);
-        }
-        .news-unlock-cta {
+        .news-blur-overlay-inner {
             text-align: center;
-            padding: 20px 16px;
-            cursor: pointer;
-            border: 1px dashed rgba(226,171,52,0.3);
-            margin: 8px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, rgba(226,171,52,0.06), rgba(6,182,212,0.04));
-            transition: border-color 0.2s, background 0.2s;
+            padding: 20px;
         }
-        .news-unlock-cta:hover {
-            border-color: rgba(226,171,52,0.5);
-            background: linear-gradient(135deg, rgba(226,171,52,0.12), rgba(6,182,212,0.08));
+        .news-blur-wrap:hover .news-blur-overlay {
+            background: linear-gradient(180deg, rgba(6,6,12,0.2) 0%, rgba(6,6,12,0.75) 60%, rgba(6,6,12,0.9) 100%);
         }
-        .news-unlock-icon { font-size: 20px; margin-bottom: 6px; }
-        .news-unlock-text {
-            font-family: 'JetBrains Mono';
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--accent);
-            letter-spacing: 0.5px;
-        }
-        .news-unlock-sub {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 4px;
+        .news-blur-wrap:hover .news-blur-content {
+            filter: blur(4px);
         }
         #upgrade-overlay {
             display: none;
