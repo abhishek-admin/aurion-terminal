@@ -363,10 +363,10 @@ function renderNews() {
         });
 
         html += `
-            <div class="news-blur-wrap" onclick="window.open('/pro','_blank')">
+            <div class="news-blur-wrap">
                 <div class="news-blur-content">${blurredHtml}</div>
                 <div class="news-blur-overlay">
-                    <div class="news-blur-overlay-inner">
+                    <div class="news-blur-overlay-inner" onclick="window.open('/pro','_blank')" style="cursor:pointer;">
                         <div style="font-size:22px; margin-bottom:8px;">🔒</div>
                         <div style="font-family:'JetBrains Mono'; font-size:12px; font-weight:700; color:var(--accent); letter-spacing:1px;">UNLOCK ${newsDataCache.length - limit}+ ARTICLES</div>
                         <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">Upgrade to Aurion Pro →</div>
@@ -432,10 +432,10 @@ function renderSentiment() {
         `).join('');
 
         listHtml += `
-            <div class="sentiment-blur-wrap" onclick="window.open('/pro','_blank')">
+            <div class="sentiment-blur-wrap">
                 <div class="sentiment-blur-content">${blurredHtml}</div>
                 <div class="sentiment-blur-overlay">
-                    <div class="sentiment-blur-overlay-inner">
+                    <div class="sentiment-blur-overlay-inner" onclick="window.open('/pro','_blank')" style="cursor:pointer;">
                         <div style="font-size:22px; margin-bottom:8px;">🔒</div>
                         <div style="font-family:'JetBrains Mono'; font-size:12px; font-weight:700; color:var(--accent); letter-spacing:1px;">UNLOCK ${allItems.length - sentLimit}+ ANALYST CALLS</div>
                         <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">Upgrade to Aurion Pro →</div>

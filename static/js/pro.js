@@ -50,6 +50,12 @@ function _initProState() {
         state = { tier: 'trial', trial_start: Date.now(), ai_used: 0, ai_date: today };
         _setProState(state);
     }
+    // Migrate old 'free' users who never had a trial → give them one
+    if (state.tier === 'free' && !state.trial_start) {
+        state.tier = 'trial';
+        state.trial_start = Date.now();
+        _setProState(state);
+    }
     // Reset daily AI counter if new day
     if (state.ai_date !== today) {
         state.ai_used = 0;
