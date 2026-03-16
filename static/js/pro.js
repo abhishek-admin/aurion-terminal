@@ -151,6 +151,14 @@ function _getTrialDaysLeft() {
     return Math.max(0, Math.ceil(daysLeft));
 }
 
+function _getTrialHoursLeft() {
+    const state = _getProState();
+    if (!state || !state.trial_start) return 0;
+    const elapsed = Date.now() - state.trial_start;
+    const hoursLeft = (PRO_CONFIG.TRIAL_DAYS * 24) - (elapsed / (1000 * 60 * 60));
+    return Math.max(0, Math.ceil(hoursLeft));
+}
+
 function isTrialActive() {
     const state = _getProState();
     if (!state || state.tier !== 'trial') return false;
@@ -312,112 +320,77 @@ function proBadgeHTML(small) {
     return `<span class="pro-badge" style="${s}">PRO</span>`;
 }
 
-// --- TRIAL / LIVE DATA BANNER ---
+// --- PERSISTENT TRIAL BANNER (always visible, bottom-center) ---
 function showLiveDataPrompt() {
     const state = _getProState();
     // Paid pro users — no banner
     if (state && state.tier === 'pro') return;
 
-    // Remove any existing banner first
-    const existing = document.getElementById('pro-live-banner');
-    if (existing) existing.remove();
+    // Don't duplicate
+    if (document.getElementById('pro-live-banner')) return;
 
     const trialActive = isTrialActive();
     const daysLeft = _getTrialDaysLeft();
 
-    let icon, heading, body, btnText;
-    if (trialActive) {
-        // During trial: show countdown
-        icon = '⏱️';
-        heading = `FREE TRIAL — ${daysLeft} DAY${daysLeft !== 1 ? 'S' : ''} LEFT`;
-        body = `You have <strong style="color:var(--cyan)">full Pro access</strong> for ${daysLeft} more day${daysLeft !== 1 ? 's' : ''}. All features unlocked — enjoy the full Aurion experience.`;
-        btnText = 'GO PRO';
-    } else {
-        // Trial expired or free tier
-        icon = '📡';
-        heading = 'YOUR FREE TRIAL HAS ENDED';
-        body = `You're now on the <strong style="color:var(--bear)">free tier</strong> with limited access. Upgrade to get <strong style="color:var(--cyan)">full Pro features</strong> — unlimited AI, all sectors, live data &amp; more.`;
-        btnText = 'UPGRADE NOW';
-    }
+    const defaultText = trialActive
+        ? `FREE TRIAL — ${daysLeft} DAY${daysLeft !== 1 ? 'S' : ''} LEFT`
+        : 'TRIAL ENDED — LIMITED ACCESS';
+    const hoverText = 'UPGRADE TO PRO →';
+    const borderColor = trialActive ? 'rgba(6,182,212,0.3)' : 'rgba(244,63,94,0.3)';
+    const textColor = trialActive ? 'var(--cyan)' : 'var(--bear)';
 
     const banner = document.createElement('div');
     banner.id = 'pro-live-banner';
     banner.innerHTML = `
-        <div style="
+        <div id="pro-live-banner-inner" style="
             position: fixed;
-            bottom: 48px;
+            bottom: 28px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 9000;
-            background: rgba(10,10,18,0.95);
-            border: 1px solid rgba(226,171,52,0.25);
+            background: var(--modal-bg, #0a0a14);
+            border: 1px solid ${borderColor};
             border-radius: 3px;
-            padding: 12px 18px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-            max-width: 560px;
-            animation: slideUp 0.4s ease-out;
+            padding: 8px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4);
         ">
-            <div style="font-size: 24px; flex-shrink: 0;">${icon}</div>
-            <div style="flex: 1;">
-                <div style="font-family:'JetBrains Mono'; font-size:11px; font-weight:700; color:var(--accent); letter-spacing:1px; margin-bottom:4px;">${heading}</div>
-                <div style="font-size:12px; color:var(--text-muted); line-height:1.5;">${body}</div>
-            </div>
-            <button onclick="window.open('/pro','_blank');this.closest('#pro-live-banner').remove();" style="
-                flex-shrink: 0;
+            <span id="pro-banner-text" style="
                 font-family:'JetBrains Mono';
                 font-size: 10px;
                 font-weight: 700;
-                letter-spacing: 1px;
-                background: var(--accent);
-                color: #06060c;
-                border: none;
-                padding: 8px 14px;
-                border-radius: 2px;
-                cursor: pointer;
-                white-space: nowrap;
-            ">${btnText}</button>
-            <button onclick="this.closest('#pro-live-banner').remove();" style="
-                position: absolute;
-                top: 4px; right: 8px;
-                background: none; border: none;
-                color: var(--text-muted);
-                font-size: 14px;
-                cursor: pointer;
-                padding: 2px;
-            ">&times;</button>
+                letter-spacing: 1.5px;
+                color: ${textColor};
+            ">${defaultText}</span>
         </div>
     `;
 
-    // Inject slide-up animation if not already present
-    if (!document.getElementById('pro-banner-anim')) {
-        const style = document.createElement('style');
-        style.id = 'pro-banner-anim';
-        style.textContent = `@keyframes slideUp { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }`;
-        document.head.appendChild(style);
-    }
-
     document.body.appendChild(banner);
 
-    // Auto-dismiss: 30s during trial, 20s after
-    const dismissMs = trialActive ? 30000 : 20000;
-    setTimeout(() => {
-        const el = document.getElementById('pro-live-banner');
-        if (el) {
-            el.style.transition = 'opacity 0.3s';
-            el.style.opacity = '0';
-            setTimeout(() => el.remove(), 300);
-        }
-    }, dismissMs);
+    const inner = document.getElementById('pro-live-banner-inner');
+    const txt = document.getElementById('pro-banner-text');
+
+    inner.addEventListener('mouseenter', () => {
+        txt.textContent = hoverText;
+        txt.style.color = 'var(--accent)';
+        inner.style.borderColor = 'rgba(226,171,52,0.4)';
+    });
+    inner.addEventListener('mouseleave', () => {
+        txt.textContent = defaultText;
+        txt.style.color = textColor;
+        inner.style.borderColor = borderColor;
+    });
+    inner.addEventListener('click', () => {
+        window.open('/pro', '_blank');
+    });
 }
 
-// Show the prompt 5 seconds after every page load
+// Show permanently on page load
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(showLiveDataPrompt, 5000));
+    document.addEventListener('DOMContentLoaded', showLiveDataPrompt);
 } else {
-    setTimeout(showLiveDataPrompt, 5000);
+    showLiveDataPrompt();
 }
 
 // --- TRIAL TAG NEXT TO LOGO ---
