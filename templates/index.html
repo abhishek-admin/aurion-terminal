@@ -158,11 +158,11 @@
         }
 
         :root.theme-light .rt.is-live {
-            animation: live-blink-bg-light 0.35s step-end infinite !important;
+            animation: live-blink-bg-light 0.7s ease-in-out infinite !important;
         }
 
         :root.theme-light .rt.is-live .rt-v {
-            animation: live-blink-text-light 0.35s step-end infinite !important;
+            animation: none !important;
         }
 
         /* Light theme: Sentiment dots — bigger, bolder, no glow */
@@ -211,16 +211,8 @@
         }
 
         @keyframes live-blink-bg-light {
-
-            0%,
-            100% {
-                background: rgba(255, 255, 255, 0.8);
-            }
-
-            50% {
-                background: #fef3c7;
-                border-color: #d97706;
-            }
+            0%, 100% { border-color: rgba(0,0,0,0.1); }
+            50% { border-color: rgba(217,119,6,0.4); }
         }
 
         @keyframes live-blink-text-light {
@@ -379,7 +371,7 @@
             font-family: 'JetBrains Mono';
             font-size: 10px;
             padding: 4px 8px;
-            border-radius: 4px;
+            border-radius: 2px;
             font-weight: bold;
             cursor: pointer;
             background: rgba(6, 182, 212, 0.1);
@@ -649,7 +641,7 @@
 
         ::-webkit-scrollbar-thumb {
             background: rgba(128, 128, 128, 0.2);
-            border-radius: 4px;
+            border-radius: 1px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
@@ -763,7 +755,7 @@
             font-size: 9px;
             font-weight: 700;
             padding: 5px 2px;
-            border-radius: 5px;
+            border-radius: 2px;
             line-height: 1.6;
         }
 
@@ -1014,23 +1006,18 @@
         .rt-c.chg-up { color: var(--bull); }
         .rt-c.chg-dn { color: var(--bear); }
 
-        /* Live radar tile — blink synced to 350ms jitter interval */
+        /* Live radar tile — subtle border pulse synced to 350ms jitter */
         .rt.is-live {
-            animation: live-blink-bg 0.35s step-end infinite;
+            animation: live-blink-bg 0.7s ease-in-out infinite;
         }
 
         .rt.is-live .rt-v {
-            animation: live-blink-text 0.35s step-end infinite;
+            animation: none;
         }
 
         @keyframes live-blink-bg {
-            0%, 100% { background: rgba(20, 20, 30, 0.4); }
-            50% { background: rgba(226,171,52,0.12); border-color: rgba(226,171,52,0.3); }
-        }
-
-        @keyframes live-blink-text {
-            0%, 100% { color: inherit; }
-            50% { color: var(--accent); text-shadow: 0 0 4px rgba(226,171,52,0.3); }
+            0%, 100% { border-color: rgba(255,255,255,0.06); }
+            50% { border-color: rgba(226,171,52,0.35); }
         }
 
         /* --- P3: NEWS FEED --- */
@@ -2202,10 +2189,10 @@
             <div class="sp-left" id="sp-left" style="overflow-y:auto; padding-right:16px;"></div>
             <div style="flex: 1; display: flex; flex-direction: column; gap: 16px; min-height: 0;">
                 <div id="ai-content"
-                    style="flex: 0 0 auto; max-height: 40vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px;">
+                    style="flex: 0 0 auto; max-height: 40vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 3px; padding: 20px;">
                 </div>
                 <div id="tv-container"
-                    style="flex: 1; min-height: 0; overflow-y: auto; background: #000; border: 1px solid var(--border); border-radius: 16px;">
+                    style="flex: 1; min-height: 0; overflow-y: auto; background: #000; border: 1px solid var(--border); border-radius: 3px;">
                 </div>
             </div>
         </div>
@@ -2213,7 +2200,7 @@
 
     <!-- ADD STOCK MODAL -->
     <div id="add-stock-overlay"
-        style="position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); z-index: 10000; display: none; align-items: center; justify-content: center;">
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; background: rgba(0, 0, 0, 0.8); z-index: 10000; display: none; align-items: center; justify-content: center;">
         <div class="settings-modal">
             <h2 style="font-family:'Outfit'; font-size:24px; color:var(--text-luma); margin-bottom:8px;">Track Specific
                 Stocks
@@ -2274,7 +2261,7 @@
                 <p style="color: var(--text-muted); font-size: 11px; margin-bottom: 12px; line-height: 1.5;">Permanently
                     delete your stored API key. AI features will stop working until a new key is configured.</p>
                 <button onclick="clearApiKey()"
-                    style="width: 100%; padding: 10px 16px; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); color: var(--bear); font-family: 'JetBrains Mono'; font-size: 11px; font-weight: 700; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px;"
+                    style="width: 100%; padding: 10px 16px; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); color: var(--bear); font-family: 'JetBrains Mono'; font-size: 11px; font-weight: 700; border-radius: 2px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px;"
                     onmouseover="this.style.background='rgba(244,63,94,0.2)'; this.style.borderColor='var(--bear)'; this.style.boxShadow='0 0 15px rgba(244,63,94,0.2)'"
                     onmouseout="this.style.background='rgba(244,63,94,0.1)'; this.style.borderColor='rgba(244,63,94,0.3)'; this.style.boxShadow='none'">🗑
                     Delete API Key</button>
@@ -2283,7 +2270,7 @@
     </div>
 
     <!-- Upgrade Modal Overlay -->
-    <div id="upgrade-overlay" onclick="if(event.target===this)closeUpgradeModal()" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); display:none; align-items:center; justify-content:center;"></div>
+    <div id="upgrade-overlay" onclick="if(event.target===this)closeUpgradeModal()" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center;"></div>
 
     <!-- Component Scripts (dependency order — pro.js MUST load first) -->
     <script src="/static/js/pro.js"></script>

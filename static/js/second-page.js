@@ -12,7 +12,7 @@ function loadTradingViewWidget(symbol) {
     if (symbol.startsWith('NSE:CNX') || symbol === 'NSE:BANKNIFTY') {
         container.innerHTML = `
             <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center;">
-                <div style="background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.3); padding: 40px; border-radius: 12px; max-width: 500px;">
+                <div style="background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.3); padding: 40px; border-radius: 3px; max-width: 500px;">
                     <h3 style="color:var(--cyan); margin-bottom: 12px; font-family:'JetBrains Mono'; font-size:16px;">EXCHANGE DATA RESTRICTED</h3>
                     <p style="color:var(--text-muted); margin-bottom: 24px; font-size:13px; line-height:1.6;">Live charting for <b>${symbol}</b> is restricted by the exchange on 3rd-party terminals.<br />View the full interactive chart directly on TradingView.</p>
                     <a href="https://in.tradingview.com/chart/?symbol=${symbol}" target="_blank" style="background: var(--cyan); color: #000; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-family:'JetBrains Mono'; font-size:13px; display:inline-block; transition:all 0.2s ease; cursor:pointer;" onmouseover="this.style.boxShadow='0 0 15px rgba(0,240,255,0.4)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='none'; this.style.transform='translateY(0)'">
@@ -82,7 +82,7 @@ window.loadChartForTicker = function (k, customSymbol = null) {
         let bClass = n.sentiment === 'bullish' ? 'bull' : (n.sentiment === 'bearish' ? 'bear' : 'neutral');
         let timeStr = n.ts ? new Date(n.ts * 1000).toLocaleString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false, day: 'numeric', month: 'short' }) : '';
         return `
-            <div onclick="window.open('${n.link}', '_blank')" style="cursor:pointer; padding:10px; border:1px solid var(--border); border-radius:8px; background:rgba(0,0,0,0.2); transition:background 0.2s;">
+            <div onclick="window.open('${n.link}', '_blank')" style="cursor:pointer; padding:10px; border:1px solid var(--border); border-radius:2px; background:rgba(0,0,0,0.2); transition:background 0.2s;">
                 <div style="font-size:12px; font-weight:500; color:var(--text-luma); margin-bottom:6px; line-height:1.4;">${n.title}</div>
                 <div style="font-family:'JetBrains Mono'; font-size:9px; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center;">
                     <span>${n.source || 'News'}</span>

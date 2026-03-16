@@ -222,7 +222,7 @@ async function streamAINewsSummary(title, desc) {
                 <div style="font-size:48px; margin-bottom:16px;">⚡</div>
                 <h2 style="color:var(--accent); font-family:'JetBrains Mono'; margin-bottom:12px;">PRO FEATURE</h2>
                 <p style="color:var(--text-muted); margin-bottom:24px;">AI News Summaries extract key insights from every headline.<br>Available exclusively on <strong style="color:var(--cyan)">Aurion Pro</strong>.</p>
-                <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:24px; text-align:left; filter:blur(3px); user-select:none;">
+                <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:3px; padding:20px; margin-bottom:24px; text-align:left; filter:blur(3px); user-select:none;">
                     <h3 style="color:var(--cyan); font-size:13px; margin-bottom:8px;">EXECUTIVE SUMMARY</h3>
                     <p style="color:var(--text-muted); font-size:12px;">Market sentiment shifts as FII flows reverse direction, impacting banking sector valuations across the board...</p>
                     <h3 style="color:var(--cyan); font-size:13px; margin-top:16px; margin-bottom:8px;">MARKET IMPACT</h3>
@@ -505,14 +505,14 @@ window.loadStockReport = function (k, symbol, csvData) {
                     <h2 style="font-family: 'Space Grotesk'; font-size: 48px; margin-bottom: 8px;">${k} Technicals & Fundamentals</h2>
                     <p style="color: var(--text-muted); font-size: 16px;">Comprehensive Algorithmic Breakdown • System Generated</p>
                 </div>
-                <a href="https://www.tradingview.com/chart/?symbol=${symbol}" target="_blank" style="background: var(--bear); color: #fff; padding: 12px 24px; border-radius: 8px; font-weight: 700; text-decoration: none; font-family: 'JetBrains Mono'; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4); border: 1px solid rgba(255,255,255,0.2); transition: transform 0.2s;">
+                <a href="https://www.tradingview.com/chart/?symbol=${symbol}" target="_blank" style="background: var(--bear); color: #fff; padding: 12px 24px; border-radius: 2px; font-weight: 700; text-decoration: none; font-family: 'JetBrains Mono'; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4); border: 1px solid rgba(255,255,255,0.2); transition: transform 0.2s;">
                     <span style="display:inline-block; width:8px; height:8px; background:#fff; border-radius:50%; animation: pulse 1s infinite;"></span>
                     OPEN ON TRADINGVIEW
                 </a>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 40px;">
-                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 24px; border-radius: 16px;">
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 24px; border-radius: 3px;">
                     <h3 style="color: var(--cyan); margin-bottom: 16px; font-family: 'JetBrains Mono'; font-size: 14px;">Q3 QUARTERLY RESULTS</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                         <div>
@@ -534,7 +534,7 @@ window.loadStockReport = function (k, symbol, csvData) {
                     </div>
                 </div>
 
-                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 24px; border-radius: 16px;">
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 24px; border-radius: 3px;">
                     <h3 style="color: var(--accent); margin-bottom: 16px; font-family: 'JetBrains Mono'; font-size: 14px;">TECHNICAL INDICATORS</h3>
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
@@ -561,7 +561,7 @@ window.loadStockReport = function (k, symbol, csvData) {
                 </div>
             </div>
 
-            <div style="background: rgba(40, 0, 0, 0.2); border: 1px solid var(--bear); padding: 24px; border-radius: 16px; margin-bottom: 40px;">
+            <div style="background: rgba(40, 0, 0, 0.2); border: 1px solid var(--bear); padding: 24px; border-radius: 3px; margin-bottom: 40px;">
                 <h3 style="color: var(--bear); margin-bottom: 16px; font-family: 'JetBrains Mono'; font-size: 14px; display: flex; align-items: center; gap: 8px;"><span>&#9888;</span> CORPORATE GOVERNANCE ALERTS</h3>
                 <div id="gov-alerts-content" style="color: var(--text-muted); font-size: 12px;">
                     <div style="display:flex; align-items:center; gap:8px; font-family:'JetBrains Mono';">
@@ -586,7 +586,7 @@ window.loadStockReport = function (k, symbol, csvData) {
         if (badgeClass === 'bullish') badgeClass = 'bull';
         if (badgeClass === 'bearish') badgeClass = 'bear';
         return `
-            <div class="sp-n-item" onclick="window.open('${n.link}', '_blank')" style="cursor:pointer; padding:12px; border:1px solid var(--border); border-radius:8px; background:rgba(0,0,0,0.2); transition: transform 0.2s;">
+            <div class="sp-n-item" onclick="window.open('${n.link}', '_blank')" style="cursor:pointer; padding:12px; border:1px solid var(--border); border-radius:2px; background:rgba(0,0,0,0.2); transition: transform 0.2s;">
                 <div class="sp-n-title" style="font-size:13px; font-weight:500; color:var(--text-luma); margin-bottom:8px;">${n.title}</div>
                 <div class="sp-n-meta" style="font-family:'JetBrains Mono'; font-size:10px; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center;">
                     <span>${n.source}</span>
