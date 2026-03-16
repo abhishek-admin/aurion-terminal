@@ -81,6 +81,8 @@ RSS_FEEDS = [
     'https://www.livemint.com/rss/technology'
 ]
 
+_prewarm_done = threading.Event()
+
 cache = {
     'market':  {'d': {}, 't': 0},
     'news':    {'d': [], 't': 0},
@@ -327,6 +329,9 @@ def pro_page():
 
 @app.route('/api/market')
 def api_market():
+    # If prewarm is still running, wait up to 2s then return whatever we have
+    if not _prewarm_done.is_set():
+        _prewarm_done.wait(timeout=2)
     return jsonify({
         'data': _fetch_market_data(),
         'hours': MARKET_HOURS
@@ -334,6 +339,8 @@ def api_market():
 
 @app.route('/api/news')
 def api_news():
+    if not _prewarm_done.is_set():
+        _prewarm_done.wait(timeout=2)
     return jsonify(_fetch_news())
 
 def _generate_mock_sentiment():
@@ -367,6 +374,8 @@ def api_sentiment():
 
 @app.route('/api/sectors')
 def api_sectors():
+    if not _prewarm_done.is_set():
+        _prewarm_done.wait(timeout=2)
     return jsonify(_fetch_sectors())
 
 @app.route('/api/sector/<name>')
@@ -460,10 +469,14 @@ def api_refresh():
     return jsonify({"status": "cleared"})
     
 def prewarm():
-    print("Prewarming caches...")
-    _fetch_market_data()
-    _fetch_sectors()
-    _fetch_news()
+    print("Prewarming caches in parallel...")
+    import concurrent.futures
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as ex:
+        ex.submit(_fetch_market_data)
+        ex.submit(_fetch_sectors)
+        ex.submit(_fetch_news)
+        ex.shutdown(wait=True)
+    _prewarm_done.set()
     print("Prewarm complete.")
 
 if __name__ == '__main__':

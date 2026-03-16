@@ -141,14 +141,17 @@ let _radarDragInited = false;
 function createRadarTile(label, valStr, dataStateClass, isLiveObjKey = false, itemId = null, changeInfo = null) {
     const isLive = (isLiveObjKey && simPrices[isLiveObjKey] && simPrices[isLiveObjKey].open);
     const liveCls = isLive ? 'is-live' : '';
-    const action = isLiveObjKey ? `onclick="if(!window._rdragged)loadChartForTicker('${isLiveObjKey}')"` : `onclick="if(!window._rdragged)openRadarIntel('${label}', '${valStr}')" style="cursor:pointer;" title="View Macro Intel"`;
+    // Random animation-delay so live tiles don't blink in sync
+    const animDelay = isLive ? `animation-delay:${(Math.random() * 0.7).toFixed(2)}s;` : '';
+    const action = isLiveObjKey ? `onclick="if(!window._rdragged)loadChartForTicker('${isLiveObjKey}')"` : `onclick="if(!window._rdragged)openRadarIntel('${label}', '${valStr}')"`;
+    const styleAttr = isLive ? `style="${animDelay}"` : (!isLiveObjKey ? 'style="cursor:pointer;" title="View Macro Intel"' : '');
     const keyAttr = isLiveObjKey ? ` data-rtkey="${isLiveObjKey}"` : '';
     const ridAttr = itemId ? ` data-rid="${itemId}"` : '';
     const dragAttr = itemId ? ' draggable="true"' : '';
     const delBtn = itemId ? `<button class="rt-del" onclick="event.stopPropagation();removeRadarItem('${itemId}')" title="Remove">&#x2715;</button>` : '';
     const dragHandle = itemId ? `<div class="rt-drag-handle" title="Drag to reorder">&#8942;&#8942;</div>` : '';
     const chgHtml = changeInfo ? `<div class="rt-c ${changeInfo.up ? 'chg-up' : 'chg-dn'}">${changeInfo.text}</div>` : '';
-    return `<div class="rt ${dataStateClass} ${liveCls}" ${action}${keyAttr}${ridAttr}${dragAttr}>
+    return `<div class="rt ${dataStateClass} ${liveCls}" ${styleAttr} ${action}${keyAttr}${ridAttr}${dragAttr}>
         ${delBtn}${dragHandle}
         <div class="rt-l">${label}</div>
         <div class="rt-v">${valStr}</div>
