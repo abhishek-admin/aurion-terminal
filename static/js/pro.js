@@ -437,15 +437,13 @@ function updateTrialBadge() {
         btn.onclick = null;
     } else if (isTrialActive()) {
         const days = _getTrialDaysLeft();
-        btn.textContent = '';
-        btn.innerHTML = `⏱ ${days}d LEFT`;
         btn.className = 'btn trial-badge-btn';
+        btn.innerHTML = `<span class="trial-dot"></span>TRIAL ${days}D`;
         btn.title = `Free trial: ${days} day${days !== 1 ? 's' : ''} remaining`;
         btn.onclick = () => showUpgradeModal('manual');
     } else {
-        btn.textContent = '';
-        btn.innerHTML = 'TRIAL ENDED';
         btn.className = 'btn trial-expired-btn';
+        btn.innerHTML = 'EXPIRED';
         btn.title = 'Your free trial has expired — upgrade to Pro';
         btn.onclick = () => showUpgradeModal('trial_expired');
     }
