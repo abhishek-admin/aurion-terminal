@@ -6,6 +6,7 @@
 
 // --- CONSTANTS ---
 const PRO_CONFIG = {
+    TRIAL_DAYS: 7,
     FREE_AI_LIMIT: 3,
     FREE_NEWS_LIMIT: 3,
     FREE_SENTIMENT_LIMIT: 3,
@@ -45,7 +46,8 @@ function _initProState() {
     let state = _getProState();
     const today = new Date().toISOString().slice(0, 10);
     if (!state) {
-        state = { tier: 'free', ai_used: 0, ai_date: today };
+        // First-time visitor: auto-start 7-day free trial
+        state = { tier: 'trial', trial_start: Date.now(), ai_used: 0, ai_date: today };
         _setProState(state);
     }
     // Reset daily AI counter if new day
@@ -57,9 +59,28 @@ function _initProState() {
     return state;
 }
 
+function _getTrialDaysLeft() {
+    const state = _getProState();
+    if (!state || !state.trial_start) return 0;
+    const elapsed = Date.now() - state.trial_start;
+    const daysLeft = PRO_CONFIG.TRIAL_DAYS - (elapsed / (1000 * 60 * 60 * 24));
+    return Math.max(0, Math.ceil(daysLeft));
+}
+
+function isTrialActive() {
+    const state = _getProState();
+    if (!state || state.tier !== 'trial') return false;
+    return _getTrialDaysLeft() > 0;
+}
+
 function isPro() {
     const state = _getProState();
-    return state && state.tier === 'pro';
+    if (!state) return false;
+    // Paid pro
+    if (state.tier === 'pro') return true;
+    // Active trial = full pro access
+    if (state.tier === 'trial') return isTrialActive();
+    return false;
 }
 
 function getAIUsedToday() {
@@ -142,6 +163,9 @@ function showUpgradeModal(reason) {
         case 'ai_news':
             reasonHTML = `<div class="up-reason">AI News Summaries are a <span style="color:var(--accent);font-weight:700">Pro</span> feature.</div>`;
             break;
+        case 'trial_expired':
+            reasonHTML = `<div class="up-reason">Your <span style="color:var(--accent);font-weight:700">7-day free trial</span> has ended. Upgrade to keep full access.</div>`;
+            break;
         case 'manual':
             reasonHTML = `<div class="up-reason">Unlock the full power of Aurion Terminal.</div>`;
             break;
@@ -204,13 +228,33 @@ function proBadgeHTML(small) {
     return `<span class="pro-badge" style="${s}">PRO</span>`;
 }
 
-// --- LIVE DATA PRO PROMPT ---
-// Shows on every page load for free users
+// --- TRIAL / LIVE DATA BANNER ---
 function showLiveDataPrompt() {
-    if (isPro()) return;
+    const state = _getProState();
+    // Paid pro users — no banner
+    if (state && state.tier === 'pro') return;
+
     // Remove any existing banner first
     const existing = document.getElementById('pro-live-banner');
     if (existing) existing.remove();
+
+    const trialActive = isTrialActive();
+    const daysLeft = _getTrialDaysLeft();
+
+    let icon, heading, body, btnText;
+    if (trialActive) {
+        // During trial: show countdown
+        icon = '⏱️';
+        heading = `FREE TRIAL — ${daysLeft} DAY${daysLeft !== 1 ? 'S' : ''} LEFT`;
+        body = `You have <strong style="color:var(--cyan)">full Pro access</strong> for ${daysLeft} more day${daysLeft !== 1 ? 's' : ''}. All features unlocked — enjoy the full Aurion experience.`;
+        btnText = 'GO PRO';
+    } else {
+        // Trial expired or free tier
+        icon = '📡';
+        heading = 'YOUR FREE TRIAL HAS ENDED';
+        body = `You're now on the <strong style="color:var(--bear)">free tier</strong> with limited access. Upgrade to get <strong style="color:var(--cyan)">full Pro features</strong> — unlimited AI, all sectors, live data &amp; more.`;
+        btnText = 'UPGRADE NOW';
+    }
 
     const banner = document.createElement('div');
     banner.id = 'pro-live-banner';
@@ -233,10 +277,10 @@ function showLiveDataPrompt() {
             max-width: 580px;
             animation: slideUp 0.4s ease-out;
         ">
-            <div style="font-size: 24px; flex-shrink: 0;">📡</div>
+            <div style="font-size: 24px; flex-shrink: 0;">${icon}</div>
             <div style="flex: 1;">
-                <div style="font-family:'JetBrains Mono'; font-size:11px; font-weight:700; color:var(--accent); letter-spacing:1px; margin-bottom:4px;">UPGRADE TO LIVE DATA</div>
-                <div style="font-size:12px; color:var(--text-muted); line-height:1.5;">You're on <strong style="color:var(--bear)">60s delayed</strong> refresh. Pro members get <strong style="color:var(--cyan)">3-second live updates</strong> for market data, news, sectors &amp; sentiment — with Bloomberg-style animations.</div>
+                <div style="font-family:'JetBrains Mono'; font-size:11px; font-weight:700; color:var(--accent); letter-spacing:1px; margin-bottom:4px;">${heading}</div>
+                <div style="font-size:12px; color:var(--text-muted); line-height:1.5;">${body}</div>
             </div>
             <button onclick="window.open('/pro','_blank');this.closest('#pro-live-banner').remove();" style="
                 flex-shrink: 0;
@@ -251,7 +295,7 @@ function showLiveDataPrompt() {
                 border-radius: 6px;
                 cursor: pointer;
                 white-space: nowrap;
-            ">GO PRO</button>
+            ">${btnText}</button>
             <button onclick="this.closest('#pro-live-banner').remove();" style="
                 position: absolute;
                 top: 4px; right: 8px;
@@ -274,7 +318,8 @@ function showLiveDataPrompt() {
 
     document.body.appendChild(banner);
 
-    // Auto-dismiss after 20 seconds
+    // Auto-dismiss: 30s during trial, 20s after
+    const dismissMs = trialActive ? 30000 : 20000;
     setTimeout(() => {
         const el = document.getElementById('pro-live-banner');
         if (el) {
@@ -282,7 +327,7 @@ function showLiveDataPrompt() {
             el.style.opacity = '0';
             setTimeout(() => el.remove(), 300);
         }
-    }, 20000);
+    }, dismissMs);
 }
 
 // Show the prompt 5 seconds after every page load
