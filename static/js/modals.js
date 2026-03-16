@@ -54,6 +54,13 @@ window.clearApiKey = function () {
 
 // --- ADD STOCK MODAL ---
 window.openAddStockModal = function () {
+    // If free user is already at the tracked limit, show upgrade modal instead
+    const maxTrack = typeof getTrackedLimit === 'function' ? getTrackedLimit() : 999;
+    const pro = typeof isPro === 'function' && isPro();
+    if (!pro && trackedStocks.length >= maxTrack) {
+        if (typeof showUpgradeModal === 'function') showUpgradeModal('tracked_limit');
+        return;
+    }
     document.getElementById('add-stock-input').value = trackedStocks.join(', ');
     document.getElementById('add-stock-overlay').style.display = 'flex';
 }
