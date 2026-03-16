@@ -29,7 +29,47 @@ const PRO_CONFIG = {
     ]
 };
 
-// --- TIER STATE ---
+// --- TIER STATE (triple-persisted: localStorage + cookie + IndexedDB) ---
+
+// Cookie helpers — survive localStorage clears
+function _setTrialCookie(trialStart) {
+    const expires = new Date(trialStart + PRO_CONFIG.TRIAL_DAYS * 86400000 + 30 * 86400000); // keep 30d after trial ends
+    document.cookie = `aurion_ts=${trialStart};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+}
+
+function _getTrialCookie() {
+    const match = document.cookie.match(/aurion_ts=(\d+)/);
+    return match ? parseInt(match[1]) : null;
+}
+
+// IndexedDB helpers — survives both localStorage and cookie clears
+function _setTrialIDB(trialStart) {
+    try {
+        const req = indexedDB.open('aurion_trial', 1);
+        req.onupgradeneeded = (e) => e.target.result.createObjectStore('meta');
+        req.onsuccess = (e) => {
+            const db = e.target.result;
+            const tx = db.transaction('meta', 'readwrite');
+            tx.objectStore('meta').put(trialStart, 'trial_start');
+        };
+    } catch (e) {}
+}
+
+function _getTrialIDB(callback) {
+    try {
+        const req = indexedDB.open('aurion_trial', 1);
+        req.onupgradeneeded = (e) => e.target.result.createObjectStore('meta');
+        req.onsuccess = (e) => {
+            const db = e.target.result;
+            const tx = db.transaction('meta', 'readonly');
+            const get = tx.objectStore('meta').get('trial_start');
+            get.onsuccess = () => callback(get.result || null);
+            get.onerror = () => callback(null);
+        };
+        req.onerror = () => callback(null);
+    } catch (e) { callback(null); }
+}
+
 function _getProState() {
     try {
         const raw = localStorage.getItem('aurion_pro');
@@ -40,30 +80,68 @@ function _getProState() {
 
 function _setProState(state) {
     localStorage.setItem('aurion_pro', JSON.stringify(state));
+    // Sync trial_start to cookie + IDB
+    if (state.trial_start) {
+        _setTrialCookie(state.trial_start);
+        _setTrialIDB(state.trial_start);
+    }
+}
+
+// Recover trial_start from cookie/IDB if localStorage was cleared
+function _recoverTrialStart() {
+    const fromCookie = _getTrialCookie();
+    if (fromCookie) return fromCookie;
+    return null; // IDB is async, handled separately below
 }
 
 function _initProState() {
     let state = _getProState();
     const today = new Date().toISOString().slice(0, 10);
+
     if (!state) {
-        // First-time visitor: auto-start 7-day free trial
-        state = { tier: 'trial', trial_start: Date.now(), ai_used: 0, ai_date: today };
+        // Check cookie backup before granting a new trial
+        const recovered = _recoverTrialStart();
+        if (recovered) {
+            // User cleared localStorage but cookie still has trial_start
+            state = { tier: 'trial', trial_start: recovered, ai_used: 0, ai_date: today };
+        } else {
+            // Truly first-time visitor: auto-start 7-day free trial
+            state = { tier: 'trial', trial_start: Date.now(), ai_used: 0, ai_date: today };
+        }
         _setProState(state);
     }
+
     // Migrate old 'free' users who never had a trial → give them one
     if (state.tier === 'free' && !state.trial_start) {
         state.tier = 'trial';
         state.trial_start = Date.now();
         _setProState(state);
     }
+
     // Reset daily AI counter if new day
     if (state.ai_date !== today) {
         state.ai_used = 0;
         state.ai_date = today;
         _setProState(state);
     }
+
     return state;
 }
+
+// Async IDB recovery — runs after init, patches if cookie was also cleared
+_getTrialIDB((idbStart) => {
+    if (!idbStart) return;
+    const state = _getProState();
+    if (state && state.trial_start && state.trial_start <= idbStart) return; // already correct or older
+    // IDB has an older trial_start — user reset localStorage+cookies, restore the original
+    if (state && (!state.trial_start || state.trial_start > idbStart)) {
+        state.trial_start = idbStart;
+        state.tier = 'trial';
+        _setProState(state);
+        // Refresh badge + banner with corrected data
+        if (typeof updateTrialBadge === 'function') updateTrialBadge();
+    }
+});
 
 function _getTrialDaysLeft() {
     const state = _getProState();
