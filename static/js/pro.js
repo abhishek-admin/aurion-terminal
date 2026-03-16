@@ -8,6 +8,7 @@
 const PRO_CONFIG = {
     FREE_AI_LIMIT: 3,
     FREE_NEWS_LIMIT: 3,
+    FREE_SENTIMENT_LIMIT: 3,
     FREE_TRACKED_LIMIT: 5,
     FREE_REFRESH_MS: 60000,
     PRO_REFRESH_MS: 18000,
@@ -102,6 +103,10 @@ function getNewsLimit() {
     return isPro() ? 999 : PRO_CONFIG.FREE_NEWS_LIMIT;
 }
 
+function getSentimentLimit() {
+    return isPro() ? 999 : PRO_CONFIG.FREE_SENTIMENT_LIMIT;
+}
+
 function getTrackedLimit() {
     return isPro() ? 999 : PRO_CONFIG.FREE_TRACKED_LIMIT;
 }
@@ -130,6 +135,9 @@ function showUpgradeModal(reason) {
             break;
         case 'tracked_limit':
             reasonHTML = `<div class="up-reason">Free tier allows ${PRO_CONFIG.FREE_TRACKED_LIMIT} tracked stocks. Pro is <span style="color:var(--accent);font-weight:700">unlimited</span>.</div>`;
+            break;
+        case 'sentiment_limit':
+            reasonHTML = `<div class="up-reason">Free tier shows ${PRO_CONFIG.FREE_SENTIMENT_LIMIT} analyst calls. Pro unlocks the full <span style="color:var(--accent);font-weight:700">sentiment stream</span>.</div>`;
             break;
         case 'ai_news':
             reasonHTML = `<div class="up-reason">AI News Summaries are a <span style="color:var(--accent);font-weight:700">Pro</span> feature.</div>`;

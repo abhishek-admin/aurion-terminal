@@ -1538,6 +1538,40 @@
         .news-blur-wrap:hover .news-blur-content {
             filter: blur(4px);
         }
+
+        /* --- Sentiment blur for free tier --- */
+        .sentiment-blur-wrap {
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: var(--radius-sm);
+            margin-top: 4px;
+        }
+        .sentiment-blur-content {
+            filter: blur(6px);
+            pointer-events: none;
+            user-select: none;
+        }
+        .sentiment-blur-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, rgba(6,6,12,0.3) 0%, rgba(6,6,12,0.85) 60%, rgba(6,6,12,0.95) 100%);
+            z-index: 2;
+        }
+        .sentiment-blur-overlay-inner {
+            text-align: center;
+            padding: 20px;
+        }
+        .sentiment-blur-wrap:hover .sentiment-blur-overlay {
+            background: linear-gradient(180deg, rgba(6,6,12,0.2) 0%, rgba(6,6,12,0.75) 60%, rgba(6,6,12,0.9) 100%);
+        }
+        .sentiment-blur-wrap:hover .sentiment-blur-content {
+            filter: blur(4px);
+        }
+
         #upgrade-overlay {
             display: none;
             position: fixed;

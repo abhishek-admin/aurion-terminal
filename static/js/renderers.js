@@ -396,7 +396,13 @@ function renderSentiment() {
     document.getElementById('s-neut').textContent = Math.round((neut / tot) * 100) + '% NEUT';
     document.getElementById('s-bear').textContent = Math.round((bear / tot) * 100) + '% BEAR';
 
-    document.getElementById('s-list').innerHTML = sentimentDataCache.slice(0, 20).map((n, i) => `
+    const sentLimit = typeof getSentimentLimit === 'function' ? getSentimentLimit() : 999;
+    const isSentFree = typeof isPro === 'function' && !isPro();
+    const allItems = sentimentDataCache.slice(0, 20);
+
+    // Clear items (first N for free, all for pro)
+    const clearItems = isSentFree ? allItems.slice(0, sentLimit) : allItems;
+    let listHtml = clearItems.map((n, i) => `
         <div class="ss-item" onclick="openSentimentPage(${i})">
             <div class="ss-dot" style="color: var(--${n.sentiment === 'bullish' ? 'bull' : (n.sentiment === 'bearish' ? 'bear' : 'neutral')})"></div>
             <div class="ss-content">
@@ -408,6 +414,38 @@ function renderSentiment() {
             </div>
         </div>
     `).join('');
+
+    // For free users: show blurred preview + overlay
+    if (isSentFree && allItems.length > sentLimit) {
+        const blurredItems = allItems.slice(sentLimit, sentLimit + 5);
+        const blurredHtml = blurredItems.map(n => `
+            <div class="ss-item">
+                <div class="ss-dot" style="color: var(--${n.sentiment === 'bullish' ? 'bull' : (n.sentiment === 'bearish' ? 'bear' : 'neutral')})"></div>
+                <div class="ss-content">
+                    <div class="ss-title">${n.title}</div>
+                    <div class="ss-meta">
+                        <span>${n.source}</span>
+                        <span>${formatExactTime(n.ts)}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        listHtml += `
+            <div class="sentiment-blur-wrap" onclick="window.open('/pro','_blank')">
+                <div class="sentiment-blur-content">${blurredHtml}</div>
+                <div class="sentiment-blur-overlay">
+                    <div class="sentiment-blur-overlay-inner">
+                        <div style="font-size:22px; margin-bottom:8px;">🔒</div>
+                        <div style="font-family:'JetBrains Mono'; font-size:12px; font-weight:700; color:var(--accent); letter-spacing:1px;">UNLOCK ${allItems.length - sentLimit}+ ANALYST CALLS</div>
+                        <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">Upgrade to Aurion Pro →</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    document.getElementById('s-list').innerHTML = listHtml;
 }
 
 function renderSectors(data) {
