@@ -427,13 +427,13 @@ function updateTrialBadge() {
     if (!btn) return;
     const state = _getProState();
 
+    // Clear any leftover inline styles from previous state
+    btn.removeAttribute('style');
+
     if (state && state.tier === 'pro') {
         // Paid pro
         btn.textContent = 'PRO ✓';
-        btn.className = 'btn';
-        btn.style.background = 'linear-gradient(135deg, var(--accent), #d4942a)';
-        btn.style.color = '#06060c';
-        btn.style.border = 'none';
+        btn.className = 'btn pro-badge-btn';
         btn.onclick = null;
     } else if (isTrialActive()) {
         const days = _getTrialDaysLeft();

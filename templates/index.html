@@ -1359,6 +1359,9 @@
             align-items: center;
             gap: 5px;
             white-space: nowrap;
+            width: auto !important;
+            height: auto !important;
+            min-height: 24px;
         }
         .trial-badge-btn .trial-dot {
             width: 5px;
@@ -1376,6 +1379,9 @@
             background: transparent !important;
             color: var(--text-muted) !important;
             border: 1px solid rgba(255,255,255,0.12) !important;
+            width: auto !important;
+            height: auto !important;
+            min-height: 24px;
             border-radius: 4px !important;
             padding: 3px 8px !important;
             font-size: 9px !important;
@@ -1385,6 +1391,21 @@
         .trial-expired-btn:hover {
             border-color: rgba(244,63,94,0.4) !important;
             color: var(--bear) !important;
+        }
+        .pro-badge-btn {
+            background: linear-gradient(135deg, var(--accent), #d4942a) !important;
+            color: #06060c !important;
+            border: none !important;
+            border-radius: 4px !important;
+            padding: 3px 8px !important;
+            font-size: 9px !important;
+            font-family: 'JetBrains Mono' !important;
+            font-weight: 700 !important;
+            letter-spacing: 1px !important;
+            width: auto !important;
+            height: auto !important;
+            min-height: 24px;
+            white-space: nowrap;
         }
 
         /* --- STATUS BAR --- */
@@ -2121,7 +2142,7 @@
                     onclick="window.searchAndOpenTicker(document.getElementById('tk-search').value)">🔍</span>
                 <div class="search-dropdown" id="search-dropdown"></div>
             </div>
-            <button class="btn" id="pro-trial-btn" onclick="showUpgradeModal('manual')" title="Upgrade to Pro" style="font-size:10px; font-family:'JetBrains Mono'; font-weight:700; letter-spacing:1px; background:linear-gradient(135deg, var(--accent), #d4942a); color:#06060c; border:none; padding:4px 10px; border-radius:4px; cursor:pointer;">PRO</button>
+            <button class="btn" id="pro-trial-btn" onclick="showUpgradeModal('manual')" title="Upgrade to Pro">PRO</button>
             <button class="btn" onclick="toggleTheme()" id="theme-btn" title="Toggle Theme">☀</button>
             <button class="btn" onclick="openSettings()" title="Settings">⚙️</button>
             <button class="btn" onclick="apiRefresh()" title="Refresh">⟳</button>
