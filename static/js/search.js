@@ -30,8 +30,23 @@ window.handleSearchInput = function (e) {
     const dd = document.getElementById('search-dropdown');
     if (!q || q.length < 1) { dd.classList.remove('active'); return; }
 
-    const matches = ALL_STOCKS.filter(x => x.t.includes(q) || x.n.toUpperCase().includes(q) || x.ac.includes(q)).slice(0, 8);
-    if (matches.length === 0) { dd.classList.remove('active'); return; }
+    let matches = ALL_STOCKS.filter(x => x.t.includes(q) || x.n.toUpperCase().includes(q) || x.ac.includes(q));
+
+    // --- PRO GATE: Limit search to NIFTY 50 for free tier ---
+    const _isFreeSearch = typeof isPro === 'function' && !isPro();
+    if (_isFreeSearch) {
+        matches = matches.filter(x => typeof isStockAllowed === 'function' ? isStockAllowed(x.t) : true);
+    }
+    matches = matches.slice(0, 8);
+    if (matches.length === 0) {
+        if (_isFreeSearch && q.length >= 2) {
+            dd.innerHTML = '<div class="sd-item" onclick="showUpgradeModal(\'stock_limit\')" style="text-align:center;cursor:pointer;"><span class="sd-title" style="color:var(--accent);">⚡ Search 5,000+ stocks with Pro</span></div>';
+            dd.classList.add('active');
+        } else {
+            dd.classList.remove('active');
+        }
+        return;
+    }
 
     dd.innerHTML = matches.map(m => {
         const safeN = (m.n || '').replace(/'/g, "\\'");

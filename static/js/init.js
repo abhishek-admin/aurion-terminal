@@ -3,11 +3,24 @@
 // Bootstrap: Initial data polls + refresh intervals
 // =============================================
 
+// --- Tier-aware refresh intervals ---
+const _marketRefreshMs = typeof getRefreshInterval === 'function' ? getRefreshInterval() : 18000;
 pollMarket(); pollNews(); pollSectors(); pollSentiment();
-setInterval(pollMarket, 18000);
+setInterval(pollMarket, _marketRefreshMs);
 setInterval(pollNews, 60000);
 setInterval(pollSectors, 30000);
 setInterval(pollSentiment, 60000);
+
+// --- Disable live-blink animation for free tier ---
+if (typeof isPro === 'function' && !isPro()) {
+    const _styleFreeTier = document.createElement('style');
+    _styleFreeTier.textContent = `
+        .rt.is-live { animation: none !important; }
+        .rt.is-live .rt-v { animation: none !important; }
+        .tk.is-open .tk-v { animation: none !important; }
+    `;
+    document.head.appendChild(_styleFreeTier);
+}
 
 // --- SCROLL TO TOP BUTTONS ---
 function initScrollTopBtn(scrollElId, btnId) {

@@ -320,7 +320,9 @@ function renderTrackedStocks() {
 
 function renderNews() {
     renderTrackedStocks();
-    document.getElementById('news-pane').innerHTML = newsDataCache.map((n, i) => {
+    const limit = typeof getNewsLimit === 'function' ? getNewsLimit() : 999;
+    const limited = newsDataCache.slice(0, limit);
+    let html = limited.map((n, i) => {
         let badgeClass = n.sentiment.toLowerCase();
         if (badgeClass === 'bullish') badgeClass = 'bull';
         if (badgeClass === 'bearish') badgeClass = 'bear';
@@ -336,6 +338,17 @@ function renderNews() {
             </div>
         `;
     }).join('');
+
+    // Show "unlock more" teaser for free users
+    if (newsDataCache.length > limit) {
+        html += `
+            <div class="n-item" onclick="showUpgradeModal('news_limit')" style="text-align:center; padding:16px; cursor:pointer; border:1px dashed var(--border); margin:8px; border-radius:8px;">
+                <div style="color:var(--accent); font-family:'JetBrains Mono'; font-size:12px; font-weight:700;">⚡ ${newsDataCache.length - limit} MORE ARTICLES</div>
+                <div style="color:var(--text-muted); font-size:11px; margin-top:4px;">Upgrade to Pro to see all headlines →</div>
+            </div>
+        `;
+    }
+    document.getElementById('news-pane').innerHTML = html;
 }
 
 function renderSentiment() {
@@ -373,21 +386,33 @@ function renderSectors(data) {
     let ht = '';
     Object.keys(data).forEach(k => {
         const r = data[k]; const isUp = r.chg_pct >= 0;
+        const locked = typeof isSectorLocked === 'function' && isSectorLocked(k);
         let spk = '';
         if (r.sparkline && r.sparkline.length) {
             const min = Math.min(...r.sparkline), max = Math.max(...r.sparkline), range = max - min || 1;
             const map = r.sparkline.map((v, i) => `${(i / (r.sparkline.length - 1)) * 100},${24 - ((v - min) / range) * 24} `);
             spk = `<svg class="s-spark ${isUp ? 'up' : 'dn'}" viewBox="0 0 100 24" preserveAspectRatio="none"><path d="M${map.join(' L')}" /></svg>`;
         }
-        ht += `<div class="sec-row" onclick="openSectorPage('${k}')">
-            <div class="s-name">${k}</div>
-            <div class="s-val ${isUp ? 'c-bull' : 'c-bear'}">${(r.chg_pct * 100).toFixed(2)}%</div>
-            <div>${spk}</div>
-            <div style="text-align:right">
-                ${r.vol_spike ? '<span class="badge b-bear" style="margin-right:6px">VOL</span>' : ''}
-                <span class="badge ${isUp ? 'b-bull' : 'b-bear'}">${r.momentum}</span>
-            </div>
-        </div>`;
+        if (locked) {
+            ht += `<div class="sec-row sec-locked" onclick="showUpgradeModal('sector_locked')">
+                <div class="s-name" style="opacity:0.5">${k} <span class="pro-badge">PRO</span></div>
+                <div class="s-val" style="opacity:0.35; filter:blur(3px)">${(r.chg_pct * 100).toFixed(2)}%</div>
+                <div style="opacity:0.3; filter:blur(2px)">${spk}</div>
+                <div style="text-align:right">
+                    <span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-muted);">🔒</span>
+                </div>
+            </div>`;
+        } else {
+            ht += `<div class="sec-row" onclick="openSectorPage('${k}')">
+                <div class="s-name">${k}</div>
+                <div class="s-val ${isUp ? 'c-bull' : 'c-bear'}">${(r.chg_pct * 100).toFixed(2)}%</div>
+                <div>${spk}</div>
+                <div style="text-align:right">
+                    ${r.vol_spike ? '<span class="badge b-bear" style="margin-right:6px">VOL</span>' : ''}
+                    <span class="badge ${isUp ? 'b-bull' : 'b-bear'}">${r.momentum}</span>
+                </div>
+            </div>`;
+        }
     });
     document.getElementById('sectors-pane').innerHTML = ht;
 }
