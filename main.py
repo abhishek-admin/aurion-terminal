@@ -142,6 +142,10 @@ def _fetch_market_data():
     for name, sym in TICKER_MAP.items():
         try:
             close_prices = hist['Close'][sym].dropna()
+            # Fallback: if batch returned no data, fetch individually
+            if len(close_prices) == 0:
+                solo = yf.Ticker(sym).history(period='5d', interval='1d')
+                close_prices = solo['Close'].dropna()
             if len(close_prices) >= 2:
                 curr = float(close_prices.iloc[-1])
                 prev = float(close_prices.iloc[-2])
